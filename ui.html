@@ -169,11 +169,11 @@
   
   <div class="info-block">
     <label>Suche</label>
-    <input id="search-input" type="text" placeholder="Nach Alt-Text suchen...">
+    <input id="search-input" type="text" placeholder="Beschreibe, was du suchst...">
   </div>
   
   <div class="button-group">
-    <button id="search-btn">Suchen</button>
+    <button id="search-btn">AI Suche starten</button>
   </div>
 </div>
 
@@ -216,6 +216,8 @@ const aiBtn = document.getElementById('ai-btn');
 
 let apiKey = '';
 
+const searchBtn = document.getElementById('search-btn');
+
 // Nachrichten vom Plugin (code.ts) empfangen
 window.onmessage = (event) => {
   const msg = event.data.pluginMessage;
@@ -223,10 +225,12 @@ window.onmessage = (event) => {
   if (msg.type === 'selection-empty') {
     editor.classList.remove('visible');
     searchContainer.classList.add('visible');
+    if (msg.apiKey) apiKey = msg.apiKey;
   } 
   else if (msg.type === 'wrong-type') {
     editor.classList.remove('visible');
     searchContainer.classList.remove('visible');
+    if (msg.apiKey) apiKey = msg.apiKey;
     // Optional: Fehlermeldung anzeigen
   } 
   else if (msg.type === 'update-data') {
@@ -238,10 +242,84 @@ window.onmessage = (event) => {
     nameDisplay.textContent = msg.nodeName;
     if (msg.apiKey) apiKey = msg.apiKey;
   }
+  else if (msg.type === 'search-data-response') {
+    performAiSearch(msg.query, msg.data);
+  }
+  else if (msg.type === 'image-data') {
+    analyzeImage(msg.bytes);
+  }
+  else if (msg.type === 'image-error') {
+    resetAiBtn();
+    alert("Fehler beim Bild-Export.");
+  }
 };
 
-aiBtn.onclick = async () => {
-  const currentText = input.value;
+function resetAiBtn() {
+  aiBtn.style.opacity = '1';
+  aiBtn.style.cursor = 'pointer';
+  aiBtn.disabled = false;
+}
+
+function bufferToBase64(buffer) {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return window.btoa(binary);
+}
+
+async function analyzeImage(bytes) {
+  try {
+    const base64Image = bufferToBase64(bytes);
+    
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: "gpt-4o", // Vision Model
+        messages: [
+          {
+            role: "system",
+            content: "Du bist ein UI/UX Experte und spezialisiert auf Barrierefreiheit. Analysiere den Screenshot dieses UI-Frames. Erstelle eine strukturierte Beschreibung, die später hilft, diesen Frame über eine Textsuche wiederzufinden. \n\nBitte folge diesem Format:\n1. **Zusammenfassung**: Was ist der Hauptzweck dieses Screens?\n2. **UI-Elemente**: Liste wichtige Komponenten mit Fachbegriffen (z.B. Navigation Bar, Hero Section, Card, Floating Action Button, Modal).\n3. **Inhalt**: Beschreibe sichtbare Texte, Überschriften und Bilder.\n\nAntworte in einem fließenden, aber strukturierten Textblock, der als 'Alt-Text' bzw. Metadaten-Beschreibung dient."
+          },
+          {
+            role: "user",
+            content: [
+              { type: "text", text: "Analysiere diesen Frame." },
+              {
+                type: "image_url",
+                image_url: {
+                  "url": `data:image/png;base64,${base64Image}`
+                }
+              }
+            ]
+          }
+        ],
+        max_tokens: 500
+      })
+    });
+
+    const data = await response.json();
+    if (data.choices && data.choices.length > 0) {
+      input.value = data.choices[0].message.content;
+    } else {
+      console.error("Keine Antwort von AI", data);
+      alert("Keine Antwort von der AI erhalten.");
+    }
+  } catch (error) {
+    console.error("Fehler bei AI Request:", error);
+    alert("Fehler bei der AI-Generierung.");
+  } finally {
+    resetAiBtn();
+  }
+}
+
+aiBtn.onclick = () => {
   if (!apiKey) {
     alert("API Key fehlt! Bitte .env prüfen.");
     return;
@@ -250,6 +328,38 @@ aiBtn.onclick = async () => {
   aiBtn.style.opacity = '0.5';
   aiBtn.style.cursor = 'wait';
   aiBtn.disabled = true;
+
+  // Trigger Image Export in code.ts
+  parent.postMessage({ pluginMessage: { type: 'get-image-for-ai' } }, '*');
+};
+
+document.getElementById('save').onclick = () => {
+  const altText = input.value;
+  parent.postMessage({ pluginMessage: { type: 'save-alt-text', altText } }, '*')
+}
+
+document.getElementById('search-btn').onclick = () => {
+  const query = searchInput.value;
+  if (!query) return;
+  
+  if (!apiKey) {
+    alert("API Key fehlt! Bitte .env prüfen.");
+    return;
+  }
+
+  searchBtn.textContent = "🔍 Analysiere...";
+  searchBtn.disabled = true;
+
+  // Schritt 1: Daten aus Figma holen
+  parent.postMessage({ pluginMessage: { type: 'collect-all-frames', query } }, '*')
+}
+
+async function performAiSearch(query, framesData) {
+  if (framesData.length === 0) {
+    alert("Keine Frames mit Alt-Texten gefunden.");
+    resetSearchBtn();
+    return;
+  }
 
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -263,41 +373,41 @@ aiBtn.onclick = async () => {
         messages: [
           {
             role: "system",
-            content: "Du bist ein Experte für Barrierefreiheit und Alt-Texte. Erstelle basierend auf der Eingabe einen präzisen, beschreibenden Alt-Text für ein Bild. Beschreibe das Bild sachlich und detailliert. Antworte nur mit dem Alt-Text."
+            content: "Du bist eine intelligente Suchmaschine für UI-Designs. Du erhältst eine Liste von Frames (mit ID und Beschreibung) und eine Suchanfrage. Deine Aufgabe ist es, den Frame zu finden, der am besten zur Anfrage passt. Antworte AUSSCHLIESSLICH mit der 'sid' des besten Treffers als reinen String. Wenn nichts passt, antworte mit 'null'."
           },
           {
             role: "user",
-            content: currentText ? `Erstelle einen Alt-Text basierend auf: "${currentText}"` : "Erstelle einen generischen Platzhalter-Alt-Text für ein Bild."
+            content: `Suchanfrage: "${query}"\n\nVerfügbare Frames:\n${JSON.stringify(framesData)}`
           }
         ],
-        temperature: 0.7
+        temperature: 0.0
       })
     });
 
     const data = await response.json();
     if (data.choices && data.choices.length > 0) {
-      input.value = data.choices[0].message.content;
+      const resultSid = data.choices[0].message.content.trim();
+      
+      if (resultSid && resultSid !== 'null') {
+        // Schritt 3: Zum gefundenen Frame navigieren
+        parent.postMessage({ pluginMessage: { type: 'zoom-to-sid', sid: resultSid } }, '*');
+      } else {
+        alert("Kein passender Frame gefunden.");
+      }
     } else {
       console.error("Keine Antwort von AI", data);
     }
   } catch (error) {
-    console.error("Fehler bei AI Request:", error);
-    alert("Fehler bei der AI-Generierung.");
+    console.error("Fehler bei AI Search:", error);
+    alert("Fehler bei der Suche.");
   } finally {
-    aiBtn.style.opacity = '1';
-    aiBtn.style.cursor = 'pointer';
-    aiBtn.disabled = false;
+    resetSearchBtn();
   }
-};
-
-document.getElementById('save').onclick = () => {
-  const altText = input.value;
-  parent.postMessage({ pluginMessage: { type: 'save-alt-text', altText } }, '*')
 }
 
-document.getElementById('search-btn').onclick = () => {
-  const query = searchInput.value;
-  parent.postMessage({ pluginMessage: { type: 'search-frames', query } }, '*')
+function resetSearchBtn() {
+  searchBtn.textContent = "AI Suche starten";
+  searchBtn.disabled = false;
 }
 
 document.getElementById('cancel').onclick = () => {

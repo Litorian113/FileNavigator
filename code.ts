@@ -14,7 +14,7 @@ function updateUI() {
   const selection = figma.currentPage.selection;
 
   if (selection.length === 0) {
-    figma.ui.postMessage({ type: 'selection-empty' });
+    figma.ui.postMessage({ type: 'selection-empty', apiKey: apiKey });
     return;
   }
 
@@ -22,7 +22,7 @@ function updateUI() {
 
   // Prüfen, ob es ein Frame ist
   if (node.type !== 'FRAME') {
-    figma.ui.postMessage({ type: 'wrong-type' });
+    figma.ui.postMessage({ type: 'wrong-type', apiKey: apiKey });
     return;
   }
 
@@ -98,6 +98,60 @@ figma.ui.onmessage = msg => {
       figma.notify(`${matches.length} Frame(s) gefunden!`);
     } else {
       figma.notify("Keine Frames mit diesem Text gefunden.");
+    }
+  }
+
+  // NEU: Sammelt alle Frames mit Alt-Text für die AI-Suche
+  if (msg.type === 'collect-all-frames') {
+    const frames = figma.currentPage.findAll(node => node.type === 'FRAME');
+    const searchableData = [];
+
+    for (const node of frames) {
+      const altText = node.getPluginData('altText');
+      const sid = node.getPluginData('sid');
+      
+      if (altText && sid) {
+        searchableData.push({
+          sid: sid,
+          name: node.name,
+          description: altText
+        });
+      }
+    }
+
+    figma.ui.postMessage({ 
+      type: 'search-data-response', 
+      data: searchableData,
+      query: msg.query 
+    });
+  }
+
+  // NEU: Zoomt zu einem spezifischen Frame anhand der SID
+  if (msg.type === 'zoom-to-sid') {
+    const node = figma.currentPage.findOne(n => n.getPluginData('sid') === msg.sid);
+    if (node) {
+      figma.currentPage.selection = [node];
+      figma.viewport.scrollAndZoomIntoView([node]);
+      figma.notify(`Gefunden: ${node.name}`);
+    } else {
+      figma.notify("Frame konnte nicht gefunden werden (evtl. gelöscht?).");
+    }
+  }
+
+  if (msg.type === 'get-image-for-ai') {
+    const selection = figma.currentPage.selection;
+    if (selection.length === 1 && selection[0].type === 'FRAME') {
+      const node = selection[0];
+      // Exportiere Frame als PNG (halbe Größe reicht für Analyse und spart Daten)
+      node.exportAsync({ format: 'PNG', constraint: { type: 'SCALE', value: 0.5 } })
+        .then(bytes => {
+          figma.ui.postMessage({ type: 'image-data', bytes: bytes });
+        })
+        .catch(err => {
+          console.error(err);
+          figma.notify("Fehler beim Exportieren des Bildes");
+          figma.ui.postMessage({ type: 'image-error' });
+        });
     }
   }
 
