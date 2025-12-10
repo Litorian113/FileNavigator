@@ -1,5 +1,9 @@
 figma.showUI(__html__, { width: 400, height: 600, themeColors: true });
 
+// API Key aus dem Build-Prozess (wird durch esbuild ersetzt)
+declare const process: { env: { OPENAI_API_KEY: string } };
+const apiKey = process.env.OPENAI_API_KEY;
+
 // Hilfsfunktion: Einfache UUID generieren
 function generateSID(): string {
   return 'sid-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now().toString(36);
@@ -30,7 +34,8 @@ function updateUI() {
     type: 'update-data',
     altText: storedAltText || '',
     sid: storedSID || 'Noch keine SID',
-    nodeName: node.name
+    nodeName: node.name,
+    apiKey: apiKey // API Key an UI senden
   });
 }
 
