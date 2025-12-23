@@ -11,7 +11,7 @@
 
   body { 
     font-family: var(--font-stack); 
-    padding: 24px; 
+    padding: 0; 
     font-size: 13px; 
     line-height: 1.5;
     color: var(--text-color);
@@ -21,6 +21,45 @@
     flex-direction: column;
     height: 100vh;
     box-sizing: border-box;
+  }
+
+  .main-content-wrapper {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+  }
+
+  /* --- TOP NAV --- */
+  .top-nav {
+    display: flex;
+    gap: 24px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 24px;
+    padding-bottom: 0;
+  }
+
+  .nav-item {
+    background: none;
+    border: none;
+    padding: 8px 0;
+    cursor: pointer;
+    font-weight: 500;
+    color: #888;
+    font-size: 13px;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    margin-bottom: -1px;
+    flex: 0;
+  }
+
+  .nav-item:hover { color: #000; }
+  
+  .nav-item.active {
+    color: #000;
+    font-weight: 600;
+    border-bottom: 2px solid #000;
   }
 
   h2 { 
@@ -147,7 +186,7 @@
     word-break: break-all;
   }
   
-  #editor-container, #search-container { display: none; height: 100%; flex-direction: column; }
+  #editor-container, #search-container, #about-container { display: none; height: 100%; flex-direction: column; }
   
   /* Utility classes for visibility control via JS */
   .visible { display: flex !important; }
@@ -158,10 +197,16 @@
   }
 </style>
 
-<h2>File Navigator</h2>
+<div class="main-content-wrapper">
+  <!-- TOP NAVIGATION -->
+  <div class="top-nav">
+    <button class="nav-item active" id="nav-search">🔍 Suche</button>
+    <button class="nav-item" id="nav-editor">📝 Editor</button>
+    <button class="nav-item" id="nav-about">ℹ️ About</button>
+  </div>
 
-<!-- Such-Container (sichtbar wenn nichts ausgewählt ist) -->
-<div id="search-container" class="container">
+  <!-- Such-Container (sichtbar wenn nichts ausgewählt ist) -->
+  <div id="search-container" class="container visible">
   <div class="info-block">
     <label>Status</label>
     <div>Kein Frame ausgewählt.</div>
@@ -174,6 +219,13 @@
   
   <div class="button-group">
     <button id="search-btn">AI Suche starten</button>
+  </div>
+
+  <!-- Export Button -->
+  <div style="margin-top: 16px; border-top: 1px solid #eee; padding-top: 16px;">
+    <button id="export-btn" style="background: white; color: #333; border: 1px solid #ccc; width: 100%;">
+      💾 Datenbank exportieren (.json)
+    </button>
   </div>
 </div>
 
@@ -205,37 +257,106 @@
   </div>
 </div>
 
+<!-- About-Container -->
+<div id="about-container" class="container">
+  <h2>Über FileNavigator</h2>
+  
+  <div class="info-block">
+    <label>Was ist das?</label>
+    <p>FileNavigator ist ein Figma-Plugin, das deine Frames mit AI-generierten Beschreibungen versieht und eine intelligente Suche ermöglicht.</p>
+  </div>
+
+  <div class="info-block">
+    <label>Features</label>
+    <ul style="margin: 0; padding-left: 20px; line-height: 1.8;">
+      <li><strong>AI Auto-Complete</strong>: Automatische Beschreibungsgenerierung via GPT-4o Vision</li>
+      <li><strong>Semantische Suche</strong>: Finde Frames über natürliche Sprache</li>
+      <li><strong>SID-System</strong>: Jeder Frame erhält eine eindeutige ID</li>
+      <li><strong>Datenbank-Export</strong>: Exportiere alle Metadaten als JSON</li>
+    </ul>
+  </div>
+
+  <div class="info-block">
+    <label>Workflow</label>
+    <ol style="margin: 0; padding-left: 20px; line-height: 1.8;">
+      <li>Frame in Figma auswählen</li>
+      <li>Plugin öffnet automatisch den Editor</li>
+      <li>✨-Button klicken für AI-Beschreibung</li>
+      <li>Speichern → SID wird generiert</li>
+      <li>Über Suche jederzeit wiederfinden</li>
+    </ol>
+  </div>
+
+  <div class="info-block">
+    <label>Technologie</label>
+    <p style="color: #666; font-size: 12px;">Figma Plugin API • OpenAI GPT-4o • TypeScript • esbuild</p>
+  </div>
+</div>
+
+</div>
+
 <script>
 const editor = document.getElementById('editor-container');
 const searchContainer = document.getElementById('search-container');
+const aboutContainer = document.getElementById('about-container');
 const nameDisplay = document.getElementById('node-name');
 const sidDisplay = document.getElementById('sid-display');
 const input = document.getElementById('alt-text');
 const searchInput = document.getElementById('search-input');
 const aiBtn = document.getElementById('ai-btn');
 
-let apiKey = '';
+const navSearch = document.getElementById('nav-search');
+const navEditor = document.getElementById('nav-editor');
+const navAbout = document.getElementById('nav-about');
 
 const searchBtn = document.getElementById('search-btn');
+const exportBtn = document.getElementById('export-btn');
+
+let apiKey = '';
+
+// --- NAV LOGIC ---
+function switchToView(viewName) {
+  // Hide all containers
+  searchContainer.classList.remove('visible');
+  editor.classList.remove('visible');
+  aboutContainer.classList.remove('visible');
+  
+  // Remove active state from all nav items
+  navSearch.classList.remove('active');
+  navEditor.classList.remove('active');
+  navAbout.classList.remove('active');
+  
+  // Show selected container and activate nav item
+  if (viewName === 'search') {
+    searchContainer.classList.add('visible');
+    navSearch.classList.add('active');
+  } else if (viewName === 'editor') {
+    editor.classList.add('visible');
+    navEditor.classList.add('active');
+  } else if (viewName === 'about') {
+    aboutContainer.classList.add('visible');
+    navAbout.classList.add('active');
+  }
+}
+
+navSearch.onclick = () => switchToView('search');
+navEditor.onclick = () => switchToView('editor');
+navAbout.onclick = () => switchToView('about');
 
 // Nachrichten vom Plugin (code.ts) empfangen
 window.onmessage = (event) => {
   const msg = event.data.pluginMessage;
 
   if (msg.type === 'selection-empty') {
-    editor.classList.remove('visible');
-    searchContainer.classList.add('visible');
+    switchToView('search');
     if (msg.apiKey) apiKey = msg.apiKey;
   } 
   else if (msg.type === 'wrong-type') {
-    editor.classList.remove('visible');
-    searchContainer.classList.remove('visible');
+    switchToView('search');
     if (msg.apiKey) apiKey = msg.apiKey;
-    // Optional: Fehlermeldung anzeigen
   } 
   else if (msg.type === 'update-data') {
-    searchContainer.classList.remove('visible');
-    editor.classList.add('visible');
+    switchToView('editor');
     
     input.value = msg.altText;
     sidDisplay.textContent = msg.sid;
@@ -251,6 +372,9 @@ window.onmessage = (event) => {
   else if (msg.type === 'image-error') {
     resetAiBtn();
     alert("Fehler beim Bild-Export.");
+  }
+  else if (msg.type === 'export-json-result') {
+    downloadJSON(msg.data);
   }
 };
 
@@ -412,5 +536,24 @@ function resetSearchBtn() {
 
 document.getElementById('cancel').onclick = () => {
   parent.postMessage({ pluginMessage: { type: 'cancel' } }, '*')
+}
+
+// NEU: Export Logik
+exportBtn.onclick = () => {
+  parent.postMessage({ pluginMessage: { type: 'export-database' } }, '*');
+};
+
+function downloadJSON(data) {
+  const jsonString = JSON.stringify(data, null, 2);
+  const blob = new Blob([jsonString], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `figma-alt-data-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 </script>
