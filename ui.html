@@ -55,6 +55,13 @@
   }
 
   .nav-item:hover { color: #000; }
+
+  .nav-item img {
+    width: 16px;
+    height: 16px;
+    vertical-align: text-bottom;
+    margin-right: 6px;
+  }
   
   .nav-item.active {
     color: #000;
@@ -200,9 +207,9 @@
 <div class="main-content-wrapper">
   <!-- TOP NAVIGATION -->
   <div class="top-nav">
-    <button class="nav-item active" id="nav-search">🔍 Suche</button>
-    <button class="nav-item" id="nav-editor">📝 Editor</button>
-    <button class="nav-item" id="nav-about">ℹ️ About</button>
+    <button class="nav-item active" id="nav-search"><img src="assets/nav-png/search.svg" alt="Suche"> Suche</button>
+    <button class="nav-item" id="nav-editor"><img src="assets/nav-png/editor.svg" alt="Editor"> Editor</button>
+    <button class="nav-item" id="nav-about"><img src="assets/nav-png/about.svg" alt="About"> About</button>
   </div>
 
   <!-- Such-Container (sichtbar wenn nichts ausgewählt ist) -->
