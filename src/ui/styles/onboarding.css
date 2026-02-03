@@ -1,0 +1,132 @@
+/* Onboarding Wizard Styles */
+
+.onboarding-container {
+  display: none;
+  flex-direction: column;
+  height: 100%;
+}
+
+.onboarding-container.visible {
+  display: flex;
+}
+
+.onboarding-header {
+  text-align: center;
+  padding: 16px 0 24px;
+}
+
+.onboarding-logo {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  background: var(--ai-gradient);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.onboarding-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.onboarding-subtitle {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+/* Progress Stepper */
+.stepper {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.step-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--border-color);
+  transition: all 0.3s;
+}
+
+.step-dot.active {
+  background: var(--primary-color);
+  transform: scale(1.2);
+}
+
+.step-dot.completed {
+  background: var(--success-color);
+}
+
+/* Step Content */
+.step-content {
+  display: none;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.step-content.active {
+  display: flex;
+}
+
+.step-question {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.step-hint {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.step-textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+/* Navigation Buttons */
+.onboarding-nav {
+  display: flex;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+  margin-top: auto;
+}
+
+.onboarding-nav .btn {
+  flex: 1;
+}
+
+/* Summary View */
+.summary-section {
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+.summary-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.summary-value {
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
