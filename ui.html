@@ -1,13 +1,20 @@
 <style>
   :root {
     --font-stack: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    --primary-color: #000000; /* Swiss Style: Starkes Schwarz */
-    --accent-color: #18A0FB; /* Figma Blue als Akzent */
+    --primary-color: #2563EB;
+    --primary-hover: #1D4ED8;
     --bg-color: #FFFFFF;
-    --text-color: #333333;
-    --border-color: #E5E5E5;
+    --bg-secondary: #F9FAFB;
+    --text-color: #111827;
+    --text-secondary: #6B7280;
+    --border-color: #E5E7EB;
     --spacing-unit: 8px;
+    --success-color: #10B981;
+    --warning-color: #F59E0B;
+    --ai-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   }
+
+  * { box-sizing: border-box; }
 
   body { 
     font-family: var(--font-stack); 
@@ -20,392 +27,1166 @@
     display: flex;
     flex-direction: column;
     height: 100vh;
-    box-sizing: border-box;
   }
 
   .main-content-wrapper {
-    padding: 24px;
+    padding: 16px;
     display: flex;
     flex-direction: column;
     height: 100%;
     overflow-y: auto;
   }
+  
+  /* --- ONBOARDING WIZARD --- */
+  .onboarding-container {
+    display: none;
+    flex-direction: column;
+    height: 100%;
+  }
+  
+  .onboarding-container.visible { display: flex; }
+  
+  .onboarding-header {
+    text-align: center;
+    padding: 16px 0 24px;
+  }
+  
+  .onboarding-logo {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 16px;
+    background: var(--ai-gradient);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+  }
+  
+  .onboarding-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  
+  .onboarding-subtitle {
+    color: var(--text-secondary);
+    font-size: 13px;
+  }
+  
+  /* Progress Stepper */
+  .stepper {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  
+  .step-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--border-color);
+    transition: all 0.3s;
+  }
+  
+  .step-dot.active { background: var(--primary-color); transform: scale(1.2); }
+  .step-dot.completed { background: var(--success-color); }
+  
+  /* Step Content */
+  .step-content {
+    display: none;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+    overflow-y: auto;
+  }
+  
+  .step-content.active { display: flex; }
+  
+  .step-question {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  
+  .step-hint {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+  }
+  
+  .step-textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+  
+  /* AI Improve Button */
+  .ai-improve-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: var(--ai-gradient);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    align-self: flex-start;
+  }
+  
+  .ai-improve-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .ai-improve-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  
+  .ai-improve-btn svg { width: 14px; height: 14px; }
+  
+  .ai-spinner {
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  
+  /* Navigation Buttons */
+  .onboarding-nav {
+    display: flex;
+    gap: 8px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+    margin-top: auto;
+  }
+  
+  .onboarding-nav .btn { flex: 1; }
+  
+  /* Summary View */
+  .summary-section {
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+  }
+  
+  .summary-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+  }
+  
+  .summary-value {
+    font-size: 13px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+  }
+
+  /* --- BRAND HEADER --- */
+  .brand-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .brand-header svg { color: var(--primary-color); }
+  
+  .brand-name {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text-color);
+  }
+  
+  .brand-tag {
+    font-size: 10px;
+    background: var(--bg-secondary);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--text-secondary);
+  }
 
   /* --- TOP NAV --- */
   .top-nav {
     display: flex;
-    gap: 24px;
-    border-bottom: 1px solid #eee;
-    margin-bottom: 24px;
-    padding-bottom: 0;
+    gap: 4px;
+    background: var(--bg-secondary);
+    padding: 4px;
+    border-radius: 8px;
+    margin-bottom: 16px;
   }
 
   .nav-item {
     background: none;
     border: none;
-    padding: 8px 0;
+    padding: 8px 12px;
     cursor: pointer;
     font-weight: 500;
-    color: #888;
-    font-size: 13px;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s;
-    margin-bottom: -1px;
-    flex: 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .nav-item:hover { color: #000; }
-
-  .nav-item svg {
-    width: 16px;
-    height: 16px;
-  }
-  
-  .nav-item.active {
-    color: #000;
-    font-weight: 600;
-    border-bottom: 2px solid #000;
-  }
-
-  h2 { 
-    margin-top: 0; 
-    margin-bottom: 24px;
-    font-weight: 700;
-    font-size: 18px;
-    letter-spacing: -0.02em;
-    color: var(--primary-color);
-    border-bottom: 2px solid var(--primary-color);
-    padding-bottom: 12px;
-  }
-
-  .container {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    flex-grow: 1;
-  }
-
-  label {
-    display: block;
-    font-weight: 600;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 6px;
-    color: #888;
-  }
-
-  input[type="text"], textarea { 
-    width: 100%; 
-    padding: 12px; 
-    margin-bottom: 0; 
-    box-sizing: border-box; 
-    border: 1px solid var(--border-color);
-    border-radius: 0; /* Swiss Style: Eher eckig */
-    font-family: var(--font-stack);
-    font-size: 13px;
-    transition: border-color 0.2s;
-    background: #FAFAFA;
-  }
-
-  input[type="text"]:focus, textarea:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    background: #FFF;
-  }
-
-  textarea {
-    resize: vertical;
-    min-height: 120px;
-    line-height: 1.6;
-  }
-
-  .button-group {
-    display: flex;
-    gap: 12px;
-    margin-top: auto; /* Push to bottom */
-    padding-top: 24px;
-  }
-
-  button { 
-    padding: 12px 20px; 
-    cursor: pointer; 
-    font-family: var(--font-stack);
-    font-weight: 600;
+    color: var(--text-secondary);
     font-size: 12px;
-    border: none;
-    border-radius: 0;
-    transition: all 0.2s;
+    border-radius: 6px;
+    transition: all 0.15s;
     flex: 1;
-  }
-
-  #save, #search-btn { 
-    background-color: var(--primary-color); 
-    color: white; 
-  }
-  
-  #save:hover, #search-btn:hover {
-    background-color: #333;
-  }
-
-  #ai-btn {
-    flex: initial; /* Don't stretch like other buttons */
-    padding: 6px;
-    background-color: transparent;
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
-    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    gap: 6px;
   }
 
-  #ai-btn:hover {
-    border-color: var(--primary-color);
-    background-color: #F5F5F5;
-  }
-
-  #cancel { 
-    background-color: transparent; 
-    border: 1px solid var(--border-color); 
+  .nav-item:hover { color: var(--text-color); background: rgba(255,255,255,0.5); }
+  .nav-item svg { width: 14px; height: 14px; }
+  
+  .nav-item.active {
     color: var(--text-color);
+    font-weight: 600;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   }
 
-  #cancel:hover {
-    border-color: var(--primary-color);
+  /* --- CONTAINERS --- */
+  .container {
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    flex-grow: 1;
+    overflow-y: auto;
   }
   
-  .info-block {
+  .container.visible { display: flex; }
+
+  /* --- SEARCH BOX --- */
+  .search-box {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  
+  .search-input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 13px;
+    background: var(--bg-secondary);
+    transition: all 0.15s;
+  }
+  
+  .search-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+  
+  .search-btn {
+    padding: 10px 16px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  
+  .search-btn:hover { background: var(--primary-hover); }
+
+  /* --- RESULT CARDS --- */
+  .results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .result-card {
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  
+  .result-card:hover {
+    border-color: var(--primary-color);
+    background: rgba(37, 99, 235, 0.02);
+  }
+  
+  .result-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  
+  .result-type {
+    font-size: 9px;
+    text-transform: uppercase;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  
+  .result-type.knowledge { background: #DBEAFE; color: #1E40AF; }
+  .result-type.screen { background: #D1FAE5; color: #065F46; }
+  .result-type.glossary { background: #FEF3C7; color: #92400E; }
+  .result-type.project { background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%); color: #667eea; }
+  
+  /* --- AI RESPONSE --- */
+  .ai-response-card {
+    padding: 16px;
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  }
+  
+  .ai-response-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  
+  .ai-response-content {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  
+  .ai-screen-link, .ai-kb-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    margin: 4px 2px;
+    transition: all 0.15s;
+  }
+  
+  .ai-screen-link:hover, .ai-kb-link:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+  
+  .ai-kb-link {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+  
+  .ai-links-section {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+  
+  .ai-links-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .ai-links-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .result-title {
+    font-weight: 600;
+    font-size: 13px;
+  }
+  
+  .result-snippet {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+  
+  .result-tags {
+    display: flex;
+    gap: 4px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+  
+  .tag {
+    font-size: 10px;
+    padding: 2px 6px;
+    background: var(--bg-secondary);
+    border-radius: 4px;
+    color: var(--text-secondary);
+  }
+
+  /* --- KNOWLEDGE TREE --- */
+  .kb-section {
     margin-bottom: 16px;
   }
-
-  .sid-display { 
-    font-family: 'Roboto Mono', monospace; 
-    background: #F5F5F5; 
-    padding: 12px; 
-    border-left: 4px solid var(--accent-color);
+  
+  .kb-section-header {
     font-size: 11px;
-    color: #555;
-    word-break: break-all;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
   
-  #editor-container, #search-container, #about-container { display: none; height: 100%; flex-direction: column; }
+  .kb-item {
+    padding: 10px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+  }
   
-  /* Utility classes for visibility control via JS */
-  .visible { display: flex !important; }
+  .kb-item:hover { background: var(--bg-secondary); }
+  .kb-item svg { width: 16px; height: 16px; color: var(--text-secondary); }
 
-  .node-name-highlight {
+  /* --- EDITOR --- */
+  .editor-section {
+    margin-bottom: 16px;
+  }
+  
+  .editor-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    display: block;
+  }
+  
+  .editor-value {
+    padding: 10px 12px;
+    background: var(--bg-secondary);
+    border-radius: 6px;
+    font-size: 13px;
+  }
+  
+  .editor-value.highlight {
+    font-weight: 600;
     color: var(--primary-color);
+  }
+  
+  .sid-display {
+    font-family: 'Monaco', 'Menlo', monospace;
+    font-size: 11px;
+    color: var(--text-secondary);
+    border-left: 3px solid var(--primary-color);
+    padding-left: 8px;
+  }
+  
+  textarea, input[type="text"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-family: var(--font-stack);
+    font-size: 13px;
+    resize: vertical;
+    transition: all 0.15s;
+  }
+  
+  textarea:focus, input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+  
+  textarea { min-height: 80px; }
+
+  /* --- BUTTONS --- */
+  .button-group {
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 16px;
+  }
+  
+  .btn {
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    flex: 1;
+    border: none;
+  }
+  
+  .btn-primary {
+    background: var(--primary-color);
+    color: white;
+  }
+  
+  .btn-primary:hover { background: var(--primary-hover); }
+  
+  .btn-secondary {
+    background: white;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+  }
+  
+  .btn-secondary:hover { border-color: var(--text-secondary); }
+
+  /* --- DETAIL VIEW --- */
+  .detail-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  
+  .back-btn {
+    background: none;
+    border: none;
+    padding: 6px;
+    cursor: pointer;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .back-btn:hover { background: var(--bg-secondary); }
+  
+  .detail-title {
+    font-size: 18px;
     font-weight: 700;
   }
+  
+  .detail-content {
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    padding: 16px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  
+  .detail-section {
+    margin-bottom: 16px;
+  }
+  
+  .detail-section:last-child { margin-bottom: 0; }
+  
+  .detail-section-title {
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+  
+  .spec-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  
+  .spec-item {
+    background: white;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+  }
+  
+  .spec-label {
+    font-size: 10px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+  }
+  
+  .spec-value {
+    font-weight: 600;
+    font-size: 14px;
+    margin-top: 2px;
+  }
+  
+  .rule-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .rule-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-color);
+    padding-left: 20px;
+    position: relative;
+  }
+  
+  .rule-list li:last-child { border-bottom: none; }
+  
+  .rule-list li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: var(--primary-color);
+  }
+
+  /* --- EMPTY STATE --- */
+  .empty-state {
+    text-align: center;
+    padding: 32px 16px;
+    color: var(--text-secondary);
+  }
+  
+  .empty-state svg {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 12px;
+    opacity: 0.5;
+  }
+  
+  .empty-state p { margin: 0; }
+
+  /* --- FEATURES INPUT --- */
+  .features-hint {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+  
+  /* --- AI CONTEXT BADGE --- */
+  .ai-context-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    border-radius: 6px;
+    font-size: 11px;
+    color: #667eea;
+    margin-bottom: 12px;
+  }
+  
+  .ai-context-badge svg { width: 14px; height: 14px; }
+  
+  /* --- INLINE AI BUTTON --- */
+  .textarea-wrapper {
+    position: relative;
+  }
+  
+  .textarea-wrapper textarea {
+    padding-right: 100px;
+  }
+  
+  .inline-ai-btn {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 10px;
+    background: var(--ai-gradient);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    opacity: 0.9;
+    transition: all 0.2s;
+  }
+  
+  .inline-ai-btn:hover { opacity: 1; }
+  .inline-ai-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .inline-ai-btn svg { width: 12px; height: 12px; }
+  
+  /* --- PROJECT SETTINGS BUTTON --- */
+  .project-settings-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text-secondary);
+    transition: all 0.15s;
+    margin-bottom: 12px;
+  }
+  
+  .project-settings-btn:hover { 
+    border-color: var(--primary-color); 
+    color: var(--primary-color);
+  }
+  
+  .project-settings-btn svg { width: 14px; height: 14px; }
 </style>
 
 <div class="main-content-wrapper">
-  <!-- TOP NAVIGATION -->
-  <div class="top-nav">
-    <button class="nav-item active" id="nav-search"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-icon lucide-search"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg> Suche</button>
-    <button class="nav-item" id="nav-editor"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-pen-line-icon lucide-file-pen-line"><path d="m18.226 5.226-2.52-2.52A2.4 2.4 0 0 0 14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-.351"/><path d="M21.378 12.626a1 1 0 0 0-3.004-3.004l-4.01 4.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z"/><path d="M8 18h1"/></svg> Editor</button>
-    <button class="nav-item" id="nav-about"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-person-standing-icon lucide-person-standing"><circle cx="12" cy="5" r="1"/><path d="m9 20 3-6 3 6"/><path d="m6 8 6 2 6-2"/><path d="M12 10v4"/></svg> About</button>
-  </div>
-
-  <!-- Such-Container (sichtbar wenn nichts ausgewählt ist) -->
-  <div id="search-container" class="container visible">
-  <div class="info-block">
-    <label>Status</label>
-    <div>Kein Frame ausgewählt.</div>
-  </div>
-  
-  <div class="info-block">
-    <label>Suche</label>
-    <input id="search-input" type="text" placeholder="Beschreibe, was du suchst...">
-  </div>
-  
-  <div class="button-group">
-    <button id="search-btn">AI Suche starten</button>
-  </div>
-
-  <!-- Export Button -->
-  <div style="margin-top: 16px; border-top: 1px solid #eee; padding-top: 16px;">
-    <button id="export-btn" style="background: white; color: #333; border: 1px solid #ccc; width: 100%;">
-      💾 Datenbank exportieren (.json)
-    </button>
-  </div>
-</div>
-
-<!-- Editor-Container (sichtbar wenn Frame ausgewählt ist) -->
-<div id="editor-container" class="container">
-  <div class="info-block">
-    <label>Ausgewählter Frame</label>
-    <div id="node-name" class="node-name-highlight"></div>
-  </div>
-  
-  <div class="info-block">
-    <label>System ID (SID)</label>
-    <div id="sid-display" class="sid-display">-</div>
-  </div>
-
-  <div class="info-block" style="flex-grow: 1; display: flex; flex-direction: column;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-      <label style="margin-bottom: 0;">Alt Beschreibung</label>
-      <button id="ai-btn" title="AI Auto-Complete">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></svg>
+  <!-- ONBOARDING WIZARD -->
+  <div id="onboarding-container" class="onboarding-container">
+    <div class="onboarding-header">
+      <div class="onboarding-logo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/><path d="M12 12 8 8"/><circle cx="12" cy="12" r="1"/></svg>
+      </div>
+      <h1 class="onboarding-title">Projekt einrichten</h1>
+      <p class="onboarding-subtitle">Beschreibe dein Projekt, damit die KI dir besser helfen kann</p>
+    </div>
+    
+    <div class="stepper">
+      <div class="step-dot active" data-step="1"></div>
+      <div class="step-dot" data-step="2"></div>
+      <div class="step-dot" data-step="3"></div>
+      <div class="step-dot" data-step="4"></div>
+      <div class="step-dot" data-step="5"></div>
+      <div class="step-dot" data-step="6"></div>
+    </div>
+    
+    <!-- Step 1: Projektname & Vision -->
+    <div class="step-content active" data-step="1">
+      <div>
+        <div class="step-question">🚀 Wie heißt dein Projekt?</div>
+        <div class="step-hint">Der Name und eine kurze Vision helfen der KI, den Kontext zu verstehen.</div>
+      </div>
+      <input type="text" id="onboard-name" placeholder="z.B. TeamChat Pro">
+      <textarea id="onboard-vision" class="step-textarea" placeholder="Was ist die Vision? z.B. Eine moderne Team-Kommunikationsplattform für Remote-Teams..."></textarea>
+      <button class="ai-improve-btn" onclick="improveWithAI('onboard-vision', 'vision')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        Mit KI verbessern
       </button>
     </div>
-    <textarea id="alt-text" placeholder="Stichworte eingeben und auf AI klicken..." style="flex-grow: 1;"></textarea>
+    
+    <!-- Step 2: Zielgruppe -->
+    <div class="step-content" data-step="2">
+      <div>
+        <div class="step-question">👥 Wer nutzt das Produkt?</div>
+        <div class="step-hint">Beschreibe die Haupt-Zielgruppe(n) so genau wie möglich.</div>
+      </div>
+      <textarea id="onboard-audience" class="step-textarea" placeholder="z.B. Remote-arbeitende Teams in mittelständischen Tech-Unternehmen, die eine Alternative zu Slack suchen..."></textarea>
+      <button class="ai-improve-btn" onclick="improveWithAI('onboard-audience', 'audience')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        Mit KI verbessern
+      </button>
+    </div>
+    
+    <!-- Step 3: Kernfeatures -->
+    <div class="step-content" data-step="3">
+      <div>
+        <div class="step-question">✨ Was sind die Kernfeatures?</div>
+        <div class="step-hint">Liste die wichtigsten Funktionen auf, die dein Produkt bietet.</div>
+      </div>
+      <textarea id="onboard-features" class="step-textarea" placeholder="z.B.
+• Echtzeit-Chat mit Threading
+• Videocalls mit Bildschirmfreigabe
+• Dateifreigabe & Suche
+• Integrationen (Jira, GitHub)
+• Dark Mode"></textarea>
+      <button class="ai-improve-btn" onclick="improveWithAI('onboard-features', 'features')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        Mit KI strukturieren
+      </button>
+    </div>
+    
+    <!-- Step 4: Designsprache -->
+    <div class="step-content" data-step="4">
+      <div>
+        <div class="step-question">🎨 Wie sieht und fühlt sich das Produkt an?</div>
+        <div class="step-hint">Beschreibe die Design-Prinzipien, Farbpalette, Tonalität.</div>
+      </div>
+      <textarea id="onboard-design" class="step-textarea" placeholder="z.B. Modern und clean mit viel Weißraum. Primärfarbe: Blau (#2563EB). Freundliche, professionelle Sprache. Accessibility ist wichtig..."></textarea>
+      <button class="ai-improve-btn" onclick="improveWithAI('onboard-design', 'design')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        Mit KI verbessern
+      </button>
+    </div>
+    
+    <!-- Step 5: Terminologie -->
+    <div class="step-content" data-step="5">
+      <div>
+        <div class="step-question">📖 Gibt es wichtige Begriffe im Projekt?</div>
+        <div class="step-hint">Definiere projektspezifische Begriffe, die die KI kennen sollte.</div>
+      </div>
+      <textarea id="onboard-terms" class="step-textarea" placeholder="z.B.
+• Workspace = Ein Team-Bereich
+• Channel = Themenbasierter Chat-Raum
+• Thread = Antwort-Kette auf eine Nachricht
+• DM = Direkte Nachricht zwischen zwei Personen"></textarea>
+      <button class="ai-improve-btn" onclick="improveWithAI('onboard-terms', 'terms')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        Mit KI strukturieren
+      </button>
+    </div>
+    
+    <!-- Step 6: Summary -->
+    <div class="step-content" data-step="6">
+      <div>
+        <div class="step-question">✅ Zusammenfassung</div>
+        <div class="step-hint">Überprüfe deine Eingaben. Du kannst sie jederzeit später bearbeiten.</div>
+      </div>
+      <div style="flex: 1; overflow-y: auto;">
+        <div class="summary-section">
+          <div class="summary-label">Projekt</div>
+          <div class="summary-value" id="summary-name">-</div>
+        </div>
+        <div class="summary-section">
+          <div class="summary-label">Vision</div>
+          <div class="summary-value" id="summary-vision">-</div>
+        </div>
+        <div class="summary-section">
+          <div class="summary-label">Zielgruppe</div>
+          <div class="summary-value" id="summary-audience">-</div>
+        </div>
+        <div class="summary-section">
+          <div class="summary-label">Kernfeatures</div>
+          <div class="summary-value" id="summary-features">-</div>
+        </div>
+        <div class="summary-section">
+          <div class="summary-label">Designsprache</div>
+          <div class="summary-value" id="summary-design">-</div>
+        </div>
+        <div class="summary-section">
+          <div class="summary-label">Terminologie</div>
+          <div class="summary-value" id="summary-terms">-</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="onboarding-nav">
+      <button class="btn btn-secondary" id="onboard-back" style="display: none;">Zurück</button>
+      <button class="btn btn-primary" id="onboard-next">Weiter</button>
+    </div>
   </div>
-  
-  <div class="button-group">
-    <button id="cancel">Abbrechen</button>
-    <button id="save">Speichern</button>
-  </div>
-</div>
 
-<!-- About-Container -->
-<div id="about-container" class="container">
-  <h2>Über FileNavigator</h2>
-  
-  <div class="info-block">
-    <label>Was ist das?</label>
-    <p>FileNavigator ist ein Figma-Plugin, das deine Frames mit AI-generierten Beschreibungen versieht und eine intelligente Suche ermöglicht.</p>
+  <!-- MAIN APP (nur sichtbar wenn Onboarding abgeschlossen) -->
+  <div id="main-app" style="display: none; flex-direction: column; height: 100%;">
+  <!-- BRAND HEADER -->
+  <div class="brand-header">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/><path d="M8 11h8"/><path d="M8 7h6"/></svg>
+    <span class="brand-name">FutureDocumentation</span>
+    <span class="brand-tag">Knowledge Base</span>
   </div>
 
-  <div class="info-block">
-    <label>Features</label>
-    <ul style="margin: 0; padding-left: 20px; line-height: 1.8;">
-      <li><strong>AI Auto-Complete</strong>: Automatische Beschreibungsgenerierung via GPT-4o Vision</li>
-      <li><strong>Semantische Suche</strong>: Finde Frames über natürliche Sprache</li>
-      <li><strong>SID-System</strong>: Jeder Frame erhält eine eindeutige ID</li>
-      <li><strong>Datenbank-Export</strong>: Exportiere alle Metadaten als JSON</li>
-    </ul>
+  <!-- TOP NAVIGATION -->
+  <div class="top-nav">
+    <button class="nav-item active" id="nav-search">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      Suche
+    </button>
+    <button class="nav-item" id="nav-browse">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+      Browse
+    </button>
+    <button class="nav-item" id="nav-editor">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/></svg>
+      Editor
+    </button>
   </div>
 
-  <div class="info-block">
-    <label>Workflow</label>
-    <ol style="margin: 0; padding-left: 20px; line-height: 1.8;">
-      <li>Frame in Figma auswählen</li>
-      <li>Plugin öffnet automatisch den Editor</li>
-      <li>✨-Button klicken für AI-Beschreibung</li>
-      <li>Speichern → SID wird generiert</li>
-      <li>Über Suche jederzeit wiederfinden</li>
-    </ol>
+  <!-- SEARCH CONTAINER -->
+  <div id="search-container" class="container visible">
+    <div class="search-box">
+      <input type="text" id="search-input" class="search-input" placeholder="Suche in Knowledge Base und Screens...">
+      <button class="search-btn" id="search-btn">Suchen</button>
+    </div>
+    
+    <div id="search-results" class="results-list">
+      <div class="empty-state">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <p>Suche nach Design-Richtlinien, Screens oder Begriffen</p>
+        <p style="font-size: 11px; margin-top: 8px;">z.B. "Icon Größe Navigation" oder "Button"</p>
+      </div>
+    </div>
   </div>
 
-  <div class="info-block">
-    <label>Technologie</label>
-    <p style="color: #666; font-size: 12px;">Figma Plugin API • OpenAI GPT-4o • TypeScript • esbuild</p>
+  <!-- BROWSE CONTAINER -->
+  <div id="browse-container" class="container">
+    <!-- Projekt-Info wird dynamisch befüllt -->
+    <div id="project-knowledge-section"></div>
+    
+    <!-- Dokumentierte Screens - dynamisch befüllt -->
+    <div id="screens-section"></div>
   </div>
-</div>
 
+  <!-- DETAIL VIEW -->
+  <div id="detail-container" class="container">
+    <div class="detail-header">
+      <button class="back-btn" id="back-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+      </button>
+      <span class="detail-title" id="detail-title">-</span>
+    </div>
+    <div class="detail-content" id="detail-content">
+      <!-- Content wird dynamisch befüllt -->
+    </div>
+  </div>
+
+  <!-- EDITOR CONTAINER -->
+  <div id="editor-container" class="container">
+    <!-- Project Context Badge -->
+    <div class="ai-context-badge" id="ai-context-badge" style="display: none;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+      <span>KI kennt: <strong id="context-project-name">-</strong></span>
+    </div>
+    
+    <!-- Project Settings Button -->
+    <button class="project-settings-btn" id="project-settings-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+      Projekt-Knowledge Base bearbeiten
+    </button>
+    
+    <div class="editor-section">
+      <span class="editor-label">Ausgewählter Frame</span>
+      <div class="editor-value highlight" id="node-name">Kein Frame ausgewählt</div>
+    </div>
+    
+    <div class="editor-section">
+      <span class="editor-label">System ID (SID)</span>
+      <div class="editor-value sid-display" id="sid-display">-</div>
+    </div>
+    
+    <div class="editor-section">
+      <span class="editor-label">Kategorie</span>
+      <select id="category-select" style="width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-family: var(--font-stack); font-size: 13px; background: white; cursor: pointer;">
+        <option value="pages">📄 Seiten</option>
+        <option value="flows">🔀 User Flows</option>
+        <option value="components">📦 Component Specs</option>
+        <option value="tests">📋 UX Tests</option>
+        <option value="archive">🗄️ Archiv</option>
+      </select>
+    </div>
+    
+    <div class="editor-section">
+      <span class="editor-label">Beschreibung</span>
+      <div class="textarea-wrapper">
+        <textarea id="alt-text" placeholder="Was zeigt dieser Screen? Wofür wird er verwendet?"></textarea>
+        <button class="inline-ai-btn" id="improve-description-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+          KI
+        </button>
+      </div>
+    </div>
+    
+    <div class="editor-section">
+      <span class="editor-label">Features / Tags</span>
+      <input type="text" id="features-input" placeholder="z.B. Login, SSO, Dark Mode">
+      <span class="features-hint">Kommagetrennte Keywords für die Suche</span>
+    </div>
+    
+    <div class="button-group">
+      <button class="btn btn-secondary" id="cancel-btn">Abbrechen</button>
+      <button class="btn btn-primary" id="save-btn">Speichern</button>
+    </div>
+  </div>
+  </div> <!-- Ende main-app -->
 </div>
 
 <script>
-const editor = document.getElementById('editor-container');
-const searchContainer = document.getElementById('search-container');
-const aboutContainer = document.getElementById('about-container');
-const nameDisplay = document.getElementById('node-name');
-const sidDisplay = document.getElementById('sid-display');
-const input = document.getElementById('alt-text');
-const searchInput = document.getElementById('search-input');
-const aiBtn = document.getElementById('ai-btn');
+// ============================================
+// STATE & ELEMENTS
+// ============================================
+let knowledgeBase = null;
+let screensList = [];
+let categoriesList = [];
+let currentView = 'search';
+let previousView = 'browse';
+let apiKey = null;
 
-const navSearch = document.getElementById('nav-search');
-const navEditor = document.getElementById('nav-editor');
-const navAbout = document.getElementById('nav-about');
+// Main Project Knowledge Base
+let mainKnowledgeBase = null;
+let currentOnboardingStep = 1;
+const TOTAL_STEPS = 6;
 
-const searchBtn = document.getElementById('search-btn');
-const exportBtn = document.getElementById('export-btn');
-
-let apiKey = '';
-
-// --- NAV LOGIC ---
-function switchToView(viewName) {
-  // Hide all containers
-  searchContainer.classList.remove('visible');
-  editor.classList.remove('visible');
-  aboutContainer.classList.remove('visible');
-  
-  // Remove active state from all nav items
-  navSearch.classList.remove('active');
-  navEditor.classList.remove('active');
-  navAbout.classList.remove('active');
-  
-  // Show selected container and activate nav item
-  if (viewName === 'search') {
-    searchContainer.classList.add('visible');
-    navSearch.classList.add('active');
-  } else if (viewName === 'editor') {
-    editor.classList.add('visible');
-    navEditor.classList.add('active');
-  } else if (viewName === 'about') {
-    aboutContainer.classList.add('visible');
-    navAbout.classList.add('active');
-  }
-}
-
-navSearch.onclick = () => switchToView('search');
-navEditor.onclick = () => switchToView('editor');
-navAbout.onclick = () => switchToView('about');
-
-// Nachrichten vom Plugin (code.ts) empfangen
-window.onmessage = (event) => {
-  const msg = event.data.pluginMessage;
-
-  if (msg.type === 'selection-empty') {
-    switchToView('search');
-    if (msg.apiKey) apiKey = msg.apiKey;
-  } 
-  else if (msg.type === 'wrong-type') {
-    switchToView('search');
-    if (msg.apiKey) apiKey = msg.apiKey;
-  } 
-  else if (msg.type === 'update-data') {
-    switchToView('editor');
-    
-    input.value = msg.altText;
-    sidDisplay.textContent = msg.sid;
-    nameDisplay.textContent = msg.nodeName;
-    if (msg.apiKey) apiKey = msg.apiKey;
-  }
-  else if (msg.type === 'search-data-response') {
-    performAiSearch(msg.query, msg.data);
-  }
-  else if (msg.type === 'image-data') {
-    analyzeImage(msg.bytes);
-  }
-  else if (msg.type === 'image-error') {
-    resetAiBtn();
-    alert("Fehler beim Bild-Export.");
-  }
-  else if (msg.type === 'export-json-result') {
-    downloadJSON(msg.data);
-  }
+const containers = {
+  search: document.getElementById('search-container'),
+  browse: document.getElementById('browse-container'),
+  detail: document.getElementById('detail-container'),
+  editor: document.getElementById('editor-container')
 };
 
-function resetAiBtn() {
-  aiBtn.style.opacity = '1';
-  aiBtn.style.cursor = 'pointer';
-  aiBtn.disabled = false;
+const navItems = {
+  search: document.getElementById('nav-search'),
+  browse: document.getElementById('nav-browse'),
+  editor: document.getElementById('nav-editor')
+};
+
+// Kategorie Icons
+const categoryIcons = {
+  pages: '📄',
+  flows: '🔀',
+  components: '📦',
+  tests: '📋',
+  archive: '🗄️'
+};
+
+// ============================================
+// ONBOARDING WIZARD
+// ============================================
+function initOnboarding() {
+  updateStepperUI();
+  
+  document.getElementById('onboard-next').onclick = () => {
+    if (currentOnboardingStep < TOTAL_STEPS) {
+      // Update summary when reaching last step
+      if (currentOnboardingStep === TOTAL_STEPS - 1) {
+        updateSummary();
+      }
+      currentOnboardingStep++;
+      updateStepperUI();
+    } else {
+      // Finish onboarding
+      saveMainKnowledgeBase();
+    }
+  };
+  
+  document.getElementById('onboard-back').onclick = () => {
+    if (currentOnboardingStep > 1) {
+      currentOnboardingStep--;
+      updateStepperUI();
+    }
+  };
 }
 
-function bufferToBase64(buffer) {
-  let binary = '';
-  const bytes = new Uint8Array(buffer);
-  const len = bytes.byteLength;
-  for (let i = 0; i < len; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return window.btoa(binary);
+function updateStepperUI() {
+  // Update dots
+  document.querySelectorAll('.step-dot').forEach((dot, i) => {
+    dot.classList.remove('active', 'completed');
+    if (i + 1 === currentOnboardingStep) {
+      dot.classList.add('active');
+    } else if (i + 1 < currentOnboardingStep) {
+      dot.classList.add('completed');
+    }
+  });
+  
+  // Update step content
+  document.querySelectorAll('.step-content').forEach((content, i) => {
+    content.classList.toggle('active', i + 1 === currentOnboardingStep);
+  });
+  
+  // Update buttons
+  const backBtn = document.getElementById('onboard-back');
+  const nextBtn = document.getElementById('onboard-next');
+  
+  backBtn.style.display = currentOnboardingStep > 1 ? 'block' : 'none';
+  nextBtn.textContent = currentOnboardingStep === TOTAL_STEPS ? '✓ Projekt speichern' : 'Weiter';
 }
 
-async function analyzeImage(bytes) {
-  try {
-    const base64Image = bufferToBase64(bytes);
+function updateSummary() {
+  document.getElementById('summary-name').textContent = document.getElementById('onboard-name').value || '-';
+  document.getElementById('summary-vision').textContent = document.getElementById('onboard-vision').value || '-';
+  document.getElementById('summary-audience').textContent = document.getElementById('onboard-audience').value || '-';
+  document.getElementById('summary-features').textContent = document.getElementById('onboard-features').value || '-';
+  document.getElementById('summary-design').textContent = document.getElementById('onboard-design').value || '-';
+  document.getElementById('summary-terms').textContent = document.getElementById('onboard-terms').value || '-';
+}
+
+function saveMainKnowledgeBase() {
+  mainKnowledgeBase = {
+    projectName: document.getElementById('onboard-name').value,
+    vision: document.getElementById('onboard-vision').value,
+    audience: document.getElementById('onboard-audience').value,
+    features: document.getElementById('onboard-features').value,
+    design: document.getElementById('onboard-design').value,
+    terminology: document.getElementById('onboard-terms').value,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+  
+  // Send to Figma to save in clientStorage
+  parent.postMessage({ 
+    pluginMessage: { 
+      type: 'save-main-knowledge-base',
+      data: mainKnowledgeBase
+    } 
+  }, '*');
+}
+
+function showMainApp() {
+  document.getElementById('onboarding-container').classList.remove('visible');
+  document.getElementById('main-app').style.display = 'flex';
+  
+  // Update context badge
+  if (mainKnowledgeBase && mainKnowledgeBase.projectName) {
+    document.getElementById('ai-context-badge').style.display = 'flex';
+    document.getElementById('context-project-name').textContent = mainKnowledgeBase.projectName;
     
+    // Update brand header with project name
+    document.querySelector('.brand-name').textContent = mainKnowledgeBase.projectName;
+  }
+  
+  // Update Browse tab with project knowledge
+  renderProjectKnowledge();
+}
+
+function showOnboarding(prefill = null) {
+  document.getElementById('main-app').style.display = 'none';
+  document.getElementById('onboarding-container').classList.add('visible');
+  
+  if (prefill) {
+    document.getElementById('onboard-name').value = prefill.projectName || '';
+    document.getElementById('onboard-vision').value = prefill.vision || '';
+    document.getElementById('onboard-audience').value = prefill.audience || '';
+    document.getElementById('onboard-features').value = prefill.features || '';
+    document.getElementById('onboard-design').value = prefill.design || '';
+    document.getElementById('onboard-terms').value = prefill.terminology || '';
+  }
+  
+  currentOnboardingStep = 1;
+  updateStepperUI();
+}
+
+// Project settings button opens onboarding in edit mode
+document.getElementById('project-settings-btn').onclick = () => {
+  showOnboarding(mainKnowledgeBase);
+};
+
+// ============================================
+// AI IMPROVEMENT FUNCTIONS
+// ============================================
+async function improveWithAI(textareaId, type) {
+  const textarea = document.getElementById(textareaId);
+  const text = textarea.value.trim();
+  
+  if (!text) {
+    alert('Bitte erst Text eingeben, den die KI verbessern soll.');
+    return;
+  }
+  
+  if (!apiKey) {
+    alert('Kein API Key verfügbar.');
+    return;
+  }
+  
+  // Find and disable the button
+  const btn = textarea.parentElement.querySelector('.ai-improve-btn') || 
+              event.target.closest('.ai-improve-btn');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<svg class="ai-spinner" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Verbessere...';
+  }
+  
+  const prompts = {
+    vision: `Verbessere und strukturiere diese Produkt-Vision. Mache sie prägnant, klar und inspirierend. Korrigiere Rechtschreibfehler. Antworte nur mit dem verbesserten Text, ohne Einleitung:\n\n${text}`,
+    audience: `Verbessere diese Zielgruppen-Beschreibung. Mache sie präziser und strukturierter. Korrigiere Rechtschreibfehler. Antworte nur mit dem verbesserten Text:\n\n${text}`,
+    features: `Strukturiere diese Feature-Liste als saubere Aufzählung mit • am Anfang jeder Zeile. Gruppiere ähnliche Features. Korrigiere Rechtschreibfehler. Antworte nur mit der strukturierten Liste:\n\n${text}`,
+    design: `Verbessere diese Design-Beschreibung. Mache sie präziser und professioneller. Korrigiere Rechtschreibfehler. Antworte nur mit dem verbesserten Text:\n\n${text}`,
+    terms: `Strukturiere dieses Glossar als saubere Liste im Format "• Begriff = Definition". Korrigiere Rechtschreibfehler. Antworte nur mit der strukturierten Liste:\n\n${text}`,
+    description: `Du bist ein UX Writer. Verbessere diese Screen-Beschreibung für Dokumentationszwecke. Kontext über das Projekt:\n${getProjectContext()}\n\nMache die Beschreibung klar, präzise und hilfreich für andere Designer. Antworte nur mit dem verbesserten Text:\n\n${text}`
+  };
+  
+  try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -413,86 +1194,169 @@ async function analyzeImage(bytes) {
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: "gpt-4o", // Vision Model
+        model: 'gpt-4o-mini',
         messages: [
-          {
-            role: "system",
-            content: "Du bist ein UI/UX Experte und spezialisiert auf Barrierefreiheit. Analysiere den Screenshot dieses UI-Frames. Erstelle eine strukturierte Beschreibung, die später hilft, diesen Frame über eine Textsuche wiederzufinden. \n\nBitte folge diesem Format:\n1. **Zusammenfassung**: Was ist der Hauptzweck dieses Screens?\n2. **UI-Elemente**: Liste wichtige Komponenten mit Fachbegriffen (z.B. Navigation Bar, Hero Section, Card, Floating Action Button, Modal).\n3. **Inhalt**: Beschreibe sichtbare Texte, Überschriften und Bilder.\n\nAntworte in einem fließenden, aber strukturierten Textblock, der als 'Alt-Text' bzw. Metadaten-Beschreibung dient."
-          },
-          {
-            role: "user",
-            content: [
-              { type: "text", text: "Analysiere diesen Frame." },
-              {
-                type: "image_url",
-                image_url: {
-                  "url": `data:image/png;base64,${base64Image}`
-                }
-              }
-            ]
-          }
+          { role: 'system', content: 'Du bist ein hilfreicher Assistent für UX-Dokumentation. Antworte immer auf Deutsch. Gib den vollständigen Text aus ohne abzuschneiden.' },
+          { role: 'user', content: prompts[type] || prompts.description }
         ],
-        max_tokens: 500
+        max_tokens: 1500,
+        temperature: 0.7
       })
     });
-
+    
     const data = await response.json();
-    if (data.choices && data.choices.length > 0) {
-      input.value = data.choices[0].message.content;
+    
+    if (data.choices && data.choices[0]) {
+      textarea.value = data.choices[0].message.content.trim();
     } else {
-      console.error("Keine Antwort von AI", data);
-      alert("Keine Antwort von der AI erhalten.");
+      console.error('AI response error:', data);
+      alert('Fehler bei der KI-Anfrage.');
     }
   } catch (error) {
-    console.error("Fehler bei AI Request:", error);
-    alert("Fehler bei der AI-Generierung.");
+    console.error('AI request failed:', error);
+    alert('Netzwerkfehler bei der KI-Anfrage.');
   } finally {
-    resetAiBtn();
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg> Mit KI verbessern';
+    }
   }
 }
 
-aiBtn.onclick = () => {
+function getProjectContext() {
+  if (!mainKnowledgeBase) return 'Kein Projektkontext verfügbar.';
+  
+  return `Projekt: ${mainKnowledgeBase.projectName || 'Unbekannt'}
+Vision: ${mainKnowledgeBase.vision || '-'}
+Zielgruppe: ${mainKnowledgeBase.audience || '-'}
+Features: ${mainKnowledgeBase.features || '-'}
+Design: ${mainKnowledgeBase.design || '-'}
+Terminologie: ${mainKnowledgeBase.terminology || '-'}`;
+}
+
+// Inline AI button for screen description
+document.getElementById('improve-description-btn').onclick = async () => {
+  const textarea = document.getElementById('alt-text');
+  const text = textarea.value.trim();
+  const nodeName = document.getElementById('node-name').textContent;
+  
   if (!apiKey) {
-    alert("API Key fehlt! Bitte .env prüfen.");
+    alert('Kein API Key verfügbar.');
     return;
   }
   
-  aiBtn.style.opacity = '0.5';
-  aiBtn.style.cursor = 'wait';
-  aiBtn.disabled = true;
-
-  // Trigger Image Export in code.ts
-  parent.postMessage({ pluginMessage: { type: 'get-image-for-ai' } }, '*');
+  const btn = document.getElementById('improve-description-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<svg class="ai-spinner" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>';
+  
+  const prompt = text 
+    ? `Verbessere diese Screen-Beschreibung für "${nodeName}". Mache sie präzise und professionell für Design-Dokumentation. Kontext:\n${getProjectContext()}\n\nBeschreibung:\n${text}`
+    : `Schreibe eine kurze, professionelle Beschreibung für einen Screen namens "${nodeName}". Kontext:\n${getProjectContext()}\n\nBeschreibe, was dieser Screen vermutlich zeigt und wofür er verwendet wird.`;
+  
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: 'Du bist ein UX Writer für Design-Dokumentation. Antworte präzise auf Deutsch. Gib den vollständigen Text aus, ohne abzuschneiden.' },
+          { role: 'user', content: prompt }
+        ],
+        max_tokens: 1000,
+        temperature: 0.7
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.choices && data.choices[0]) {
+      textarea.value = data.choices[0].message.content.trim();
+    }
+  } catch (error) {
+    console.error('AI request failed:', error);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg> KI';
+  }
 };
 
-document.getElementById('save').onclick = () => {
-  const altText = input.value;
-  parent.postMessage({ pluginMessage: { type: 'save-alt-text', altText } }, '*')
+// ============================================
+// VIEW MANAGEMENT
+// ============================================
+function switchToView(viewName) {
+  // Hide all
+  Object.values(containers).forEach(c => c.classList.remove('visible'));
+  Object.values(navItems).forEach(n => n.classList.remove('active'));
+  
+  // Show selected
+  containers[viewName].classList.add('visible');
+  if (navItems[viewName]) navItems[viewName].classList.add('active');
+  
+  previousView = currentView;
+  currentView = viewName;
 }
 
-document.getElementById('search-btn').onclick = () => {
-  const query = searchInput.value;
+// Nav clicks
+navItems.search.onclick = () => switchToView('search');
+navItems.browse.onclick = () => switchToView('browse');
+navItems.editor.onclick = () => switchToView('editor');
+
+// Back button
+document.getElementById('back-btn').onclick = () => switchToView(previousView);
+
+// ============================================
+// SEARCH (Hybrid: Keyword + KI)
+// ============================================
+document.getElementById('search-btn').onclick = performSearch;
+document.getElementById('search-input').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') performSearch();
+});
+
+// Erkennt ob die Query eine Frage/kontextuelle Suche ist
+function isContextualQuery(query) {
+  const questionWords = ['wo ', 'wie ', 'was ', 'welche', 'warum', 'wann', 'wer ', 'zeig', 'find', 'such', 'gibt es', 'habe ich', 'haben wir', '?'];
+  const lowerQuery = query.toLowerCase();
+  return questionWords.some(word => lowerQuery.includes(word)) || query.length > 30;
+}
+
+async function performSearch() {
+  const query = document.getElementById('search-input').value.trim();
   if (!query) return;
   
-  if (!apiKey) {
-    alert("API Key fehlt! Bitte .env prüfen.");
-    return;
+  const container = document.getElementById('search-results');
+  
+  // Zeige Lade-Status
+  container.innerHTML = `
+    <div class="empty-state">
+      <svg class="ai-spinner" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+      <p>Suche...</p>
+    </div>
+  `;
+  
+  if (isContextualQuery(query) && apiKey) {
+    // Kontextuelle KI-Suche
+    await performAISearch(query);
+  } else {
+    // Normale Keyword-Suche
+    parent.postMessage({ pluginMessage: { type: 'search-knowledge', query } }, '*');
   }
-
-  searchBtn.textContent = "🔍 Analysiere...";
-  searchBtn.disabled = true;
-
-  // Schritt 1: Daten aus Figma holen
-  parent.postMessage({ pluginMessage: { type: 'collect-all-frames', query } }, '*')
 }
 
-async function performAiSearch(query, framesData) {
-  if (framesData.length === 0) {
-    alert("Keine Frames mit Alt-Texten gefunden.");
-    resetSearchBtn();
-    return;
-  }
-
+// KI-gestützte kontextuelle Suche
+async function performAISearch(query) {
+  const container = document.getElementById('search-results');
+  
+  // Baue Kontext aus Main KB + allen Screens
+  let context = `# Projekt-Knowledge Base\n${getProjectContext()}\n\n`;
+  context += `# Dokumentierte Screens (${screensList.length}):\n`;
+  screensList.forEach(screen => {
+    context += `- "${screen.name}" (Kategorie: ${screen.category}): ${screen.description || 'Keine Beschreibung'}\n`;
+  });
+  
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -501,70 +1365,580 @@ async function performAiSearch(query, framesData) {
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: "gpt-3.5-turbo",
+        model: 'gpt-4o-mini',
         messages: [
-          {
-            role: "system",
-            content: "Du bist eine intelligente Suchmaschine für UI-Designs. Du erhältst eine Liste von Frames (mit ID und Beschreibung) und eine Suchanfrage. Deine Aufgabe ist es, den Frame zu finden, der am besten zur Anfrage passt. Antworte AUSSCHLIESSLICH mit der 'sid' des besten Treffers als reinen String. Wenn nichts passt, antworte mit 'null'."
+          { 
+            role: 'system', 
+            content: `Du bist ein Assistent für Design-Dokumentation. Du hilfst bei der Suche in einem Figma-Projekt.
+            
+Antworte auf Deutsch. Wenn du relevante Screens findest, formatiere sie so:
+[SCREEN:screen-name] - kurze Erklärung warum relevant
+
+Wenn du Infos aus der Knowledge Base findest, formatiere sie so:
+[KB:section-name] - kurze Erklärung
+
+Sei präzise und hilfreich. Wenn nichts passt, sag das ehrlich.`
           },
-          {
-            role: "user",
-            content: `Suchanfrage: "${query}"\n\nVerfügbare Frames:\n${JSON.stringify(framesData)}`
+          { 
+            role: 'user', 
+            content: `Kontext über das Projekt:\n${context}\n\nFrage: ${query}` 
           }
         ],
-        temperature: 0.0
+        max_tokens: 500,
+        temperature: 0.3
       })
     });
-
+    
     const data = await response.json();
-    if (data.choices && data.choices.length > 0) {
-      const resultSid = data.choices[0].message.content.trim();
-      
-      if (resultSid && resultSid !== 'null') {
-        // Schritt 3: Zum gefundenen Frame navigieren
-        parent.postMessage({ pluginMessage: { type: 'zoom-to-sid', sid: resultSid } }, '*');
-      } else {
-        alert("Kein passender Frame gefunden.");
-      }
+    
+    if (data.choices && data.choices[0]) {
+      const aiResponse = data.choices[0].message.content;
+      renderAISearchResults(aiResponse, query);
     } else {
-      console.error("Keine Antwort von AI", data);
+      container.innerHTML = `<div class="empty-state"><p>Fehler bei der KI-Suche</p></div>`;
     }
   } catch (error) {
-    console.error("Fehler bei AI Search:", error);
-    alert("Fehler bei der Suche.");
-  } finally {
-    resetSearchBtn();
+    console.error('AI search failed:', error);
+    // Fallback auf normale Suche
+    parent.postMessage({ pluginMessage: { type: 'search-knowledge', query } }, '*');
   }
 }
 
-function resetSearchBtn() {
-  searchBtn.textContent = "AI Suche starten";
-  searchBtn.disabled = false;
+// Rendert KI-Suchergebnisse mit automatisch erkannten klickbaren Links
+function renderAISearchResults(aiResponse, query) {
+  const container = document.getElementById('search-results');
+  
+  // Formatiere die Antwort (basic - Zeilenumbrüche)
+  let formattedResponse = aiResponse.replace(/\n/g, '<br>');
+  
+  // Automatisch erkennen, welche KB-Bereiche erwähnt werden
+  const kbKeywords = {
+    'vision': ['vision', 'ziel des projekts', 'mission', 'zweck', 'wofür'],
+    'audience': ['zielgruppe', 'nutzer', 'user', 'publikum', 'wer nutzt', 'für wen'],
+    'features': ['feature', 'funktion', 'was kann', 'funktionalität', 'module'],
+    'design': ['design', 'farbe', 'farben', 'typografie', 'schrift', 'visual', 'stil', 'color', 'spacing', 'ui'],
+    'terminology': ['terminologie', 'begriffe', 'glossar', 'definition', 'was bedeutet', 'wording']
+  };
+  
+  const kbNames = {
+    'vision': '🎯 Projektvision',
+    'audience': '👥 Zielgruppe', 
+    'features': '⚡ Features',
+    'design': '🎨 Designsprache',
+    'terminology': '📖 Terminologie'
+  };
+  
+  const detectedKB = [];
+  const lowerResponse = aiResponse.toLowerCase();
+  const lowerQuery = query.toLowerCase();
+  
+  for (const [kbId, keywords] of Object.entries(kbKeywords)) {
+    if (keywords.some(kw => lowerResponse.includes(kw) || lowerQuery.includes(kw))) {
+      // Prüfe ob dieser Bereich in der KB existiert und Inhalt hat
+      if (mainKnowledgeBase && mainKnowledgeBase[kbId]) {
+        detectedKB.push({ id: kbId, name: kbNames[kbId] });
+      }
+    }
+  }
+  
+  // Automatisch erkennen, welche Screens erwähnt werden
+  const detectedScreens = [];
+  screensList.forEach(screen => {
+    const screenNameLower = screen.name.toLowerCase();
+    const screenWords = screenNameLower.split(/[-_\s]+/);
+    
+    // Prüfe ob Screen-Name oder wichtige Wörter daraus in der Antwort vorkommen
+    if (lowerResponse.includes(screenNameLower) || 
+        screenWords.some(word => word.length > 3 && lowerResponse.includes(word)) ||
+        (screen.category && lowerResponse.includes(screen.category.toLowerCase()))) {
+      detectedScreens.push(screen);
+    }
+  });
+  
+  // Baue HTML
+  let linksHTML = '';
+  
+  if (detectedKB.length > 0) {
+    linksHTML += `
+      <div class="ai-links-section">
+        <div class="ai-links-title">📚 Relevante Knowledge Base Einträge:</div>
+        <div class="ai-links-container">
+          ${detectedKB.map(kb => `<button class="ai-kb-link" data-kb="${kb.id}">${kb.name}</button>`).join('')}
+        </div>
+      </div>
+    `;
+  }
+  
+  if (detectedScreens.length > 0) {
+    linksHTML += `
+      <div class="ai-links-section">
+        <div class="ai-links-title">🖼 Relevante Screens:</div>
+        <div class="ai-links-container">
+          ${detectedScreens.slice(0, 5).map(s => `<button class="ai-screen-link" data-sid="${s.sid}">🖼 ${s.name}</button>`).join('')}
+        </div>
+      </div>
+    `;
+  }
+  
+  container.innerHTML = `
+    <div class="ai-response-card">
+      <div class="ai-response-header">
+        <span class="result-type project">🤖 KI-Antwort</span>
+        <span style="font-size: 11px; color: var(--text-secondary);">für "${query}"</span>
+      </div>
+      <div class="ai-response-content">${formattedResponse}</div>
+      ${linksHTML}
+    </div>
+  `;
+  
+  // Click handlers für Screen-Links
+  container.querySelectorAll('.ai-screen-link').forEach(btn => {
+    btn.onclick = () => {
+      parent.postMessage({ pluginMessage: { type: 'zoom-to-sid', sid: btn.dataset.sid } }, '*');
+    };
+  });
+  
+  // Click handlers für KB-Links
+  container.querySelectorAll('.ai-kb-link').forEach(btn => {
+    btn.onclick = () => {
+      const kbId = btn.dataset.kb;
+      showProjectKnowledgeDetail(kbId);
+    };
+  });
 }
 
-document.getElementById('cancel').onclick = () => {
-  parent.postMessage({ pluginMessage: { type: 'cancel' } }, '*')
+function renderSearchResults(results, query) {
+  const container = document.getElementById('search-results');
+  
+  if (results.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+        <p>Keine Ergebnisse für "${query}"</p>
+      </div>
+    `;
+    return;
+  }
+  
+  container.innerHTML = results.map(r => `
+    <div class="result-card" data-type="${r.type}" data-id="${r.id}">
+      <div class="result-header">
+        <span class="result-type ${r.type}">${
+          r.type === 'project' ? '🧠 Projekt' : 
+          r.type === 'screen' ? '🖼 Screen' : 
+          r.type === 'knowledge' ? '📚 Knowledge' : 
+          '📖 Glossar'
+        }</span>
+        <span class="result-title">${r.title}</span>
+      </div>
+      <div class="result-snippet">${r.snippet}</div>
+      ${r.tags.length > 0 ? `<div class="result-tags">${r.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>` : ''}
+    </div>
+  `).join('');
+  
+  // Click handlers
+  container.querySelectorAll('.result-card').forEach(card => {
+    card.onclick = () => {
+      const type = card.dataset.type;
+      const id = card.dataset.id;
+      
+      if (type === 'screen') {
+        parent.postMessage({ pluginMessage: { type: 'zoom-to-sid', sid: id } }, '*');
+      } else if (type === 'knowledge') {
+        showKnowledgeDetail(id);
+      } else if (type === 'glossary') {
+        showGlossaryDetail(id);
+      } else if (type === 'project') {
+        showProjectKnowledgeDetail(id);
+      }
+    };
+  });
 }
 
-// NEU: Export Logik
-exportBtn.onclick = () => {
-  parent.postMessage({ pluginMessage: { type: 'export-database' } }, '*');
+// ============================================
+// BROWSE - Project Knowledge
+// ============================================
+function initBrowseTree() {
+  renderProjectKnowledge();
+  renderScreensSection();
+}
+
+// Rendert die Projekt-Knowledge-Base aus dem Onboarding
+function renderProjectKnowledge() {
+  const section = document.getElementById('project-knowledge-section');
+  
+  if (!mainKnowledgeBase || !mainKnowledgeBase.projectName) {
+    section.innerHTML = `
+      <div class="empty-state">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        <p>Kein Projekt eingerichtet</p>
+        <p style="font-size: 11px; margin-top: 8px;">Starte das Onboarding um dein Projekt zu beschreiben</p>
+      </div>
+    `;
+    return;
+  }
+  
+  const kb = mainKnowledgeBase;
+  
+  const knowledgeItems = [
+    { id: 'vision', icon: '🚀', title: 'Projekt & Vision', content: kb.vision, hasContent: !!kb.vision },
+    { id: 'audience', icon: '👥', title: 'Zielgruppe', content: kb.audience, hasContent: !!kb.audience },
+    { id: 'features', icon: '✨', title: 'Kernfeatures', content: kb.features, hasContent: !!kb.features },
+    { id: 'design', icon: '🎨', title: 'Designsprache', content: kb.design, hasContent: !!kb.design },
+    { id: 'terminology', icon: '📖', title: 'Terminologie', content: kb.terminology, hasContent: !!kb.terminology }
+  ];
+  
+  let html = `
+    <div class="kb-section">
+      <div class="kb-section-header">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        ${kb.projectName}
+      </div>
+  `;
+  
+  knowledgeItems.forEach(item => {
+    if (!item.hasContent) return;
+    
+    html += `
+      <div class="kb-item project-kb-item" data-kb-id="${item.id}">
+        <span style="font-size: 16px;">${item.icon}</span>
+        <div style="flex: 1; min-width: 0;">
+          <div style="font-weight: 500;">${item.title}</div>
+          <div style="font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+            ${item.content.substring(0, 60)}${item.content.length > 60 ? '...' : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  
+  html += `</div>`;
+  section.innerHTML = html;
+  
+  // Click handlers für Knowledge Items
+  section.querySelectorAll('.project-kb-item').forEach(item => {
+    item.onclick = () => showProjectKnowledgeDetail(item.dataset.kbId);
+  });
+}
+
+// Zeigt Detail-Ansicht für Projekt-Knowledge
+function showProjectKnowledgeDetail(id) {
+  if (!mainKnowledgeBase) return;
+  
+  const kb = mainKnowledgeBase;
+  const items = {
+    vision: { icon: '🚀', title: 'Projekt & Vision', content: kb.vision },
+    audience: { icon: '👥', title: 'Zielgruppe', content: kb.audience },
+    features: { icon: '✨', title: 'Kernfeatures', content: kb.features },
+    design: { icon: '🎨', title: 'Designsprache', content: kb.design },
+    terminology: { icon: '📖', title: 'Terminologie', content: kb.terminology }
+  };
+  
+  const item = items[id];
+  if (!item) return;
+  
+  document.getElementById('detail-title').textContent = `${item.icon} ${item.title}`;
+  
+  // Format content with line breaks preserved
+  const formattedContent = item.content
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line)
+    .map(line => {
+      if (line.startsWith('•') || line.startsWith('-') || line.startsWith('*')) {
+        return `<li>${line.substring(1).trim()}</li>`;
+      }
+      return `<p>${line}</p>`;
+    })
+    .join('');
+  
+  const hasListItems = formattedContent.includes('<li>');
+  
+  document.getElementById('detail-content').innerHTML = `
+    <div class="detail-section">
+      <div class="detail-section-title">${kb.projectName}</div>
+      ${hasListItems ? `<ul class="rule-list">${formattedContent.replace(/<p>|<\/p>/g, '')}</ul>` : formattedContent}
+    </div>
+    <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border-color);">
+      <button class="btn btn-secondary" style="width: 100%;" onclick="showOnboarding(mainKnowledgeBase)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/></svg>
+        Bearbeiten
+      </button>
+    </div>
+  `;
+  
+  switchToView('detail');
+}
+
+// Rendert die dokumentierten Screens nach Kategorie gruppiert
+function renderScreensSection() {
+  const screensSection = document.getElementById('screens-section');
+  
+  if (screensList.length === 0) {
+    screensSection.innerHTML = '';
+    return;
+  }
+  
+  // Gruppiere Screens nach Kategorie
+  const grouped = {};
+  screensList.forEach(screen => {
+    const cat = screen.category || 'pages';
+    if (!grouped[cat]) grouped[cat] = [];
+    grouped[cat].push(screen);
+  });
+  
+  let html = '';
+  
+  // Für jede Kategorie die Screens hat, einen Abschnitt erstellen
+  categoriesList.forEach(category => {
+    const screens = grouped[category.id];
+    if (!screens || screens.length === 0) return;
+    
+    html += `
+      <div class="kb-section">
+        <div class="kb-section-header">
+          <span style="font-size: 14px;">${categoryIcons[category.id] || '📁'}</span>
+          ${category.label} (${screens.length})
+        </div>
+        ${screens.map(screen => `
+          <div class="kb-item screen-item" data-sid="${screen.sid}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/></svg>
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${screen.name}</div>
+              ${screen.description ? `<div style="font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${screen.description.substring(0, 50)}${screen.description.length > 50 ? '...' : ''}</div>` : ''}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  });
+  
+  screensSection.innerHTML = html;
+  
+  // Click handlers für Screens
+  screensSection.querySelectorAll('.screen-item').forEach(item => {
+    item.onclick = () => {
+      parent.postMessage({ pluginMessage: { type: 'zoom-to-sid', sid: item.dataset.sid } }, '*');
+    };
+  });
+}
+
+// ============================================
+// DETAIL VIEW
+// ============================================
+function showKnowledgeDetail(id) {
+  if (!knowledgeBase) return;
+  
+  const allKnowledge = [
+    ...knowledgeBase.knowledge.foundations,
+    ...knowledgeBase.knowledge.components,
+    ...knowledgeBase.knowledge.patterns
+  ];
+  
+  const item = allKnowledge.find(k => k.id === id);
+  if (!item) return;
+  
+  document.getElementById('detail-title').textContent = item.title;
+  
+  let html = `
+    <div class="detail-section">
+      <div class="detail-section-title">Übersicht</div>
+      <p>${item.content.overview}</p>
+    </div>
+  `;
+  
+  // Render sizes/scale if exists
+  if (item.content.sizes || item.content.scale) {
+    const data = item.content.sizes || item.content.scale;
+    html += `
+      <div class="detail-section">
+        <div class="detail-section-title">Größen / Skala</div>
+        <div class="spec-grid">
+          ${data.map(s => `
+            <div class="spec-item">
+              <div class="spec-label">${s.name}</div>
+              <div class="spec-value">${s.size || s.value || s.height || '-'}</div>
+              <div style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">${s.usage}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+  
+  // Render navigation specs if exists
+  if (item.content.navigation) {
+    html += `
+      <div class="detail-section">
+        <div class="detail-section-title">Navigation Specs</div>
+        <div class="spec-grid">
+          ${Object.entries(item.content.navigation).map(([key, val]) => `
+            <div class="spec-item">
+              <div class="spec-label">${key}</div>
+              <div class="spec-value">${val.size || val.height || val.width}</div>
+              ${val.touchTarget ? `<div style="font-size: 11px; color: var(--text-secondary);">Touch: ${val.touchTarget}</div>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+  
+  // Render rules if exists
+  if (item.content.rules && item.content.rules.length > 0) {
+    html += `
+      <div class="detail-section">
+        <div class="detail-section-title">Regeln</div>
+        <ul class="rule-list">
+          ${item.content.rules.map(r => `<li>${r}</li>`).join('')}
+        </ul>
+      </div>
+    `;
+  }
+  
+  // Tags
+  html += `
+    <div class="result-tags" style="margin-top: 16px;">
+      ${item.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+    </div>
+  `;
+  
+  document.getElementById('detail-content').innerHTML = html;
+  switchToView('detail');
+}
+
+function showGlossaryDetail(term) {
+  if (!knowledgeBase) return;
+  
+  const item = knowledgeBase.glossary.find(g => g.term === term);
+  if (!item) return;
+  
+  document.getElementById('detail-title').textContent = item.term;
+  document.getElementById('detail-content').innerHTML = `
+    <div class="detail-section">
+      <div class="detail-section-title">Definition</div>
+      <p>${item.definition}</p>
+    </div>
+    ${item.specs ? `
+      <div class="detail-section">
+        <div class="detail-section-title">Spezifikation</div>
+        <p style="font-family: monospace; background: white; padding: 8px; border-radius: 4px;">${item.specs}</p>
+      </div>
+    ` : ''}
+  `;
+  
+  switchToView('detail');
+}
+
+// ============================================
+// EDITOR
+// ============================================
+document.getElementById('save-btn').onclick = () => {
+  const description = document.getElementById('alt-text').value;
+  const features = document.getElementById('features-input').value;
+  const category = document.getElementById('category-select').value;
+  
+  parent.postMessage({ 
+    pluginMessage: { 
+      type: 'save-screen-data',
+      description,
+      features,
+      category
+    } 
+  }, '*');
 };
 
-function downloadJSON(data) {
-  const jsonString = JSON.stringify(data, null, 2);
-  const blob = new Blob([jsonString], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
+document.getElementById('cancel-btn').onclick = () => {
+  parent.postMessage({ pluginMessage: { type: 'cancel' } }, '*');
+};
+
+// ============================================
+// MESSAGE HANDLER
+// ============================================
+window.onmessage = (event) => {
+  const msg = event.data.pluginMessage;
+  if (!msg) return;
   
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `figma-alt-data-${new Date().toISOString().slice(0,10)}.json`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
+  // Store API key from any message that includes it
+  if (msg.apiKey) {
+    apiKey = msg.apiKey;
+  }
+  
+  if (msg.type === 'main-knowledge-base-loaded') {
+    mainKnowledgeBase = msg.data;
+    
+    if (mainKnowledgeBase && mainKnowledgeBase.projectName) {
+      // Project exists, show main app
+      showMainApp();
+    } else {
+      // No project yet, show onboarding
+      showOnboarding();
+    }
+  }
+  
+  if (msg.type === 'main-knowledge-base-saved') {
+    mainKnowledgeBase = msg.data;
+    showMainApp();
+  }
+  
+  if (msg.type === 'knowledge-base-data') {
+    knowledgeBase = msg.data;
+    screensList = msg.screens || [];
+    categoriesList = msg.categories || [
+      { id: 'pages', label: 'Seiten' },
+      { id: 'flows', label: 'User Flows' },
+      { id: 'components', label: 'Component Specs' },
+      { id: 'tests', label: 'UX Tests' },
+      { id: 'archive', label: 'Archiv' }
+    ];
+    initBrowseTree();
+  }
+  
+  if (msg.type === 'screens-updated') {
+    screensList = msg.screens || [];
+    categoriesList = msg.categories || [
+      { id: 'pages', label: 'Seiten' },
+      { id: 'flows', label: 'User Flows' },
+      { id: 'components', label: 'Component Specs' },
+      { id: 'tests', label: 'UX Tests' },
+      { id: 'archive', label: 'Archiv' }
+    ];
+    renderScreensSection();
+    console.log('Screens updated:', screensList);
+  }
+  
+  if (msg.type === 'search-results') {
+    renderSearchResults(msg.results, msg.query);
+  }
+  
+  if (msg.type === 'selection-empty' || msg.type === 'wrong-type') {
+    document.getElementById('node-name').textContent = 'Kein Frame ausgewählt';
+    document.getElementById('sid-display').textContent = '-';
+    document.getElementById('alt-text').value = '';
+    document.getElementById('features-input').value = '';
+    document.getElementById('category-select').value = 'pages';
+    // Bleibe im aktuellen View, wechsle nicht automatisch
+  }
+  
+  if (msg.type === 'update-data') {
+    document.getElementById('node-name').textContent = msg.nodeName;
+    document.getElementById('sid-display').textContent = msg.sid;
+    document.getElementById('alt-text').value = msg.altText || '';
+    document.getElementById('features-input').value = msg.features || '';
+    document.getElementById('category-select').value = msg.category || 'pages';
+    switchToView('editor');
+  }
+  
+  if (msg.type === 'all-screens-data') {
+    screensList = msg.screens || [];
+    renderScreensSection();
+  }
+};
+
+// ============================================
+// INIT
+// ============================================
+initOnboarding();
+parent.postMessage({ pluginMessage: { type: 'get-main-knowledge-base' } }, '*');
+parent.postMessage({ pluginMessage: { type: 'get-knowledge-base' } }, '*');
 </script>
-<!-- Test -->
- <!-- Test -->
-   <!-- Test -->

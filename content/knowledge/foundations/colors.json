@@ -1,0 +1,66 @@
+{
+  "id": "kb-colors",
+  "title": "Farbsystem",
+  "category": "foundations",
+  "lastUpdated": "2026-02-03",
+  "author": "Design Team",
+  
+  "content": {
+    "overview": "FutureDocumentation nutzt ein semantisches Farbsystem basierend auf Funktionen, nicht auf Farbnamen.",
+    
+    "primary": {
+      "name": "Primary",
+      "hex": "#2563EB",
+      "rgb": "37, 99, 235",
+      "usage": "Primäre Aktionen, Links, Fokus-States",
+      "variants": {
+        "light": "#3B82F6",
+        "dark": "#1D4ED8"
+      }
+    },
+    
+    "semantic": [
+      {
+        "name": "Success",
+        "hex": "#10B981",
+        "usage": "Erfolgreiche Aktionen, Bestätigungen, Verfügbarkeit"
+      },
+      {
+        "name": "Warning",
+        "hex": "#F59E0B",
+        "usage": "Warnungen, Hinweise die Aufmerksamkeit brauchen"
+      },
+      {
+        "name": "Error",
+        "hex": "#EF4444",
+        "usage": "Fehler, Lösch-Aktionen, kritische Zustände"
+      },
+      {
+        "name": "Info",
+        "hex": "#3B82F6",
+        "usage": "Informative Hinweise, Tooltips"
+      }
+    ],
+    
+    "neutral": {
+      "description": "Graustufen für Text, Hintergründe und Borders",
+      "scale": [
+        { "name": "Gray-50", "hex": "#F9FAFB", "usage": "Hintergründe, Hover-States" },
+        { "name": "Gray-100", "hex": "#F3F4F6", "usage": "Disabled Backgrounds" },
+        { "name": "Gray-200", "hex": "#E5E7EB", "usage": "Borders, Dividers" },
+        { "name": "Gray-400", "hex": "#9CA3AF", "usage": "Placeholder Text" },
+        { "name": "Gray-600", "hex": "#4B5563", "usage": "Secondary Text" },
+        { "name": "Gray-900", "hex": "#111827", "usage": "Primary Text" }
+      ]
+    },
+    
+    "rules": [
+      "Kontrast-Ratio für Text: mindestens 4.5:1 (WCAG AA)",
+      "Farbe nie als einziger Informationsträger",
+      "Dark Mode: Farben um 10-20% entsättigen"
+    ]
+  },
+  
+  "linkedFrames": [],
+  "tags": ["farben", "colors", "branding", "accessibility", "kontrast"]
+}

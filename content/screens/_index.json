@@ -1,0 +1,14 @@
+{
+  "id": "screens-index",
+  "title": "Screen Dokumentation",
+  "description": "Hier werden Screens dokumentiert, die Designer über das Plugin hinzufügen.",
+  "lastUpdated": "2026-02-03",
+  
+  "instructions": {
+    "howToAdd": "Frame in Figma auswählen → Plugin Editor → Speichern",
+    "linkToKnowledge": "Screens können mit Knowledge-Einträgen verlinkt werden",
+    "search": "Alle Screens sind über die Suche auffindbar"
+  },
+  
+  "screens": []
+}

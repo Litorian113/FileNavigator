@@ -1,0 +1,30 @@
+{
+  "brand": "FutureDocumentation",
+  "version": "1.0.0",
+  "description": "Design System Knowledge Base für FutureDocumentation",
+  "lastUpdated": "2026-02-03",
+  
+  "settings": {
+    "defaultLanguage": "de",
+    "enableAI": false,
+    "syncMode": "local"
+  },
+
+  "structure": {
+    "knowledge": {
+      "label": "Design System",
+      "icon": "book",
+      "description": "Foundations, Components & Guidelines"
+    },
+    "screens": {
+      "label": "Screens",
+      "icon": "layout",
+      "description": "Dokumentierte UI-Screens"
+    },
+    "glossary": {
+      "label": "Glossar",
+      "icon": "message-circle",
+      "description": "Firmenspezifische Begriffe"
+    }
+  }
+}

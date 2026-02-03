@@ -1,0 +1,79 @@
+{
+  "id": "kb-typography",
+  "title": "Typografie",
+  "category": "foundations",
+  "lastUpdated": "2026-02-03",
+  "author": "Design Team",
+  
+  "content": {
+    "overview": "FutureDocumentation verwendet Inter als primäre Schrift für optimale Lesbarkeit auf Screens.",
+    
+    "fontFamily": {
+      "primary": "Inter",
+      "fallback": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      "mono": "JetBrains Mono, 'Fira Code', monospace"
+    },
+    
+    "scale": [
+      {
+        "name": "Display",
+        "size": "48px",
+        "lineHeight": "1.1",
+        "weight": "700",
+        "usage": "Hero Headlines, Marketing"
+      },
+      {
+        "name": "H1",
+        "size": "32px",
+        "lineHeight": "1.2",
+        "weight": "700",
+        "usage": "Seitentitel"
+      },
+      {
+        "name": "H2",
+        "size": "24px",
+        "lineHeight": "1.3",
+        "weight": "600",
+        "usage": "Section Headers"
+      },
+      {
+        "name": "H3",
+        "size": "18px",
+        "lineHeight": "1.4",
+        "weight": "600",
+        "usage": "Subsections, Card Titles"
+      },
+      {
+        "name": "Body",
+        "size": "16px",
+        "lineHeight": "1.5",
+        "weight": "400",
+        "usage": "Fließtext, Standard"
+      },
+      {
+        "name": "Body Small",
+        "size": "14px",
+        "lineHeight": "1.5",
+        "weight": "400",
+        "usage": "Kompakte Bereiche, Tabellen"
+      },
+      {
+        "name": "Caption",
+        "size": "12px",
+        "lineHeight": "1.4",
+        "weight": "400",
+        "usage": "Labels, Hinweise, Timestamps"
+      }
+    ],
+    
+    "rules": [
+      "Maximale Zeilenlänge: 65-75 Zeichen",
+      "Absatzabstand: 1em (entspricht Schriftgröße)",
+      "Keine Schriftgröße unter 12px für lesbare Texte",
+      "Links: underline on hover, nicht permanent"
+    ]
+  },
+  
+  "linkedFrames": [],
+  "tags": ["typografie", "typography", "schrift", "font", "text", "headlines"]
+}

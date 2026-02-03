@@ -1,0 +1,58 @@
+{
+  "id": "glossary",
+  "title": "FutureDocumentation Glossar",
+  "lastUpdated": "2026-02-03",
+  
+  "terms": [
+    {
+      "term": "Hero Section",
+      "definition": "Der prominente Bereich am Anfang einer Seite mit Hauptüberschrift, Subline und primärer CTA.",
+      "usage": "Landing Pages, Marketing-Seiten",
+      "specs": "Mindesthöhe: 400px, Max 2 CTAs"
+    },
+    {
+      "term": "CTA",
+      "definition": "Call-to-Action – Button oder Link der zur Hauptaktion auffordert.",
+      "usage": "'Jetzt starten', 'Kostenlos testen'",
+      "specs": "Primary Button, kontrastreich"
+    },
+    {
+      "term": "Card",
+      "definition": "Container für zusammengehörige Inhalte mit optionalem Header, Content und Footer.",
+      "usage": "Listen, Dashboards, Produkt-Übersichten",
+      "specs": "Padding: 16-24px, Border-Radius: 8px, Shadow: subtle"
+    },
+    {
+      "term": "Modal",
+      "definition": "Überlagerndes Fenster das Fokus erzwingt. Blockiert Interaktion mit Hintergrund.",
+      "usage": "Bestätigungen, Formulare, wichtige Entscheidungen",
+      "specs": "Max-Width: 480px (sm), 640px (md), Overlay: 50% schwarz"
+    },
+    {
+      "term": "Toast",
+      "definition": "Kurze, nicht-blockierende Benachrichtigung. Verschwindet automatisch.",
+      "usage": "Erfolgs-/Fehlermeldungen nach Aktionen",
+      "specs": "Duration: 4s, Position: Bottom-Center oder Top-Right"
+    },
+    {
+      "term": "Skeleton",
+      "definition": "Platzhalter-Darstellung während Inhalte laden. Zeigt Struktur des kommenden Inhalts.",
+      "usage": "Ersetzt Content während API-Calls",
+      "specs": "Animierte Graustufen-Blöcke, gleiche Größe wie echter Content"
+    },
+    {
+      "term": "Empty State",
+      "definition": "Darstellung wenn keine Daten vorhanden sind. Erklärt Situation und bietet nächsten Schritt.",
+      "usage": "Leere Listen, erste Nutzung, keine Suchergebnisse",
+      "specs": "Illustration (optional), Headline, Beschreibung, CTA"
+    },
+    {
+      "term": "Flyout",
+      "definition": "Bei FutureDocumentation: Ausgeklapptes Menü das bei Hover/Click erscheint.",
+      "usage": "Dropdown-Menüs, Mega-Navigation",
+      "specs": "Z-Index: 50, Shadow: md, Animation: 150ms ease"
+    }
+  ],
+  
+  "tags": ["glossar", "begriffe", "terminologie", "definitionen"]
+}
