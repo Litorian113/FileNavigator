@@ -14,6 +14,12 @@
     --ai-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   }
 
+  /* --- INLINE ICONS --- */
+  .icon { display: inline-flex; width: 16px; height: 16px; vertical-align: middle; flex-shrink: 0; }
+  .icon svg { width: 100%; height: 100%; }
+  .icon-sm { width: 14px; height: 14px; }
+  .icon-lg { width: 20px; height: 20px; }
+
   * { box-sizing: border-box; }
 
   body { 
@@ -758,34 +764,34 @@
     <!-- Step 1: Projektname & Vision -->
     <div class="step-content active" data-step="1">
       <div>
-        <div class="step-question">🚀 Wie heißt dein Projekt?</div>
+        <div class="step-question"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg></span> Wie heißt dein Projekt?</div>
         <div class="step-hint">Der Name und eine kurze Vision helfen der KI, den Kontext zu verstehen.</div>
       </div>
       <input type="text" id="onboard-name" placeholder="z.B. TeamChat Pro">
       <textarea id="onboard-vision" class="step-textarea" placeholder="Was ist die Vision? z.B. Eine moderne Team-Kommunikationsplattform für Remote-Teams..."></textarea>
       <button class="ai-improve-btn" onclick="improveWithAI('onboard-vision', 'vision')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-        Mit KI verbessern
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></svg>
+        verbessern
       </button>
     </div>
     
     <!-- Step 2: Zielgruppe -->
     <div class="step-content" data-step="2">
       <div>
-        <div class="step-question">👥 Wer nutzt das Produkt?</div>
+        <div class="step-question"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg></span> Wer nutzt das Produkt?</div>
         <div class="step-hint">Beschreibe die Haupt-Zielgruppe(n) so genau wie möglich.</div>
       </div>
       <textarea id="onboard-audience" class="step-textarea" placeholder="z.B. Remote-arbeitende Teams in mittelständischen Tech-Unternehmen, die eine Alternative zu Slack suchen..."></textarea>
       <button class="ai-improve-btn" onclick="improveWithAI('onboard-audience', 'audience')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-        Mit KI verbessern
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></svg>
+        verbessern
       </button>
     </div>
     
     <!-- Step 3: Kernfeatures -->
     <div class="step-content" data-step="3">
       <div>
-        <div class="step-question">✨ Was sind die Kernfeatures?</div>
+        <div class="step-question"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></svg></span> Was sind die Kernfeatures?</div>
         <div class="step-hint">Liste die wichtigsten Funktionen auf, die dein Produkt bietet.</div>
       </div>
       <textarea id="onboard-features" class="step-textarea" placeholder="z.B.
@@ -795,28 +801,28 @@
 • Integrationen (Jira, GitHub)
 • Dark Mode"></textarea>
       <button class="ai-improve-btn" onclick="improveWithAI('onboard-features', 'features')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-        Mit KI strukturieren
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></svg>
+        strukturieren
       </button>
     </div>
     
     <!-- Step 4: Designsprache -->
     <div class="step-content" data-step="4">
       <div>
-        <div class="step-question">🎨 Wie sieht und fühlt sich das Produkt an?</div>
+        <div class="step-question"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z"/><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/></svg></span> Wie sieht und fühlt sich das Produkt an?</div>
         <div class="step-hint">Beschreibe die Design-Prinzipien, Farbpalette, Tonalität.</div>
       </div>
       <textarea id="onboard-design" class="step-textarea" placeholder="z.B. Modern und clean mit viel Weißraum. Primärfarbe: Blau (#2563EB). Freundliche, professionelle Sprache. Accessibility ist wichtig..."></textarea>
       <button class="ai-improve-btn" onclick="improveWithAI('onboard-design', 'design')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-        Mit KI verbessern
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></svg>
+        verbessern
       </button>
     </div>
     
     <!-- Step 5: Terminologie -->
     <div class="step-content" data-step="5">
       <div>
-        <div class="step-question">📖 Gibt es wichtige Begriffe im Projekt?</div>
+        <div class="step-question"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v14"/><path d="M16 12h2"/><path d="M16 8h2"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/><path d="M6 12h2"/><path d="M6 8h2"/></svg></span> Gibt es wichtige Begriffe im Projekt?</div>
         <div class="step-hint">Definiere projektspezifische Begriffe, die die KI kennen sollte.</div>
       </div>
       <textarea id="onboard-terms" class="step-textarea" placeholder="z.B.
@@ -825,15 +831,15 @@
 • Thread = Antwort-Kette auf eine Nachricht
 • DM = Direkte Nachricht zwischen zwei Personen"></textarea>
       <button class="ai-improve-btn" onclick="improveWithAI('onboard-terms', 'terms')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-        Mit KI strukturieren
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></svg>
+        strukturieren
       </button>
     </div>
     
     <!-- Step 6: Summary -->
     <div class="step-content" data-step="6">
       <div>
-        <div class="step-question">✅ Zusammenfassung</div>
+        <div class="step-question"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg></span> Zusammenfassung</div>
         <div class="step-hint">Überprüfe deine Eingaben. Du kannst sie jederzeit später bearbeiten.</div>
       </div>
       <div style="flex: 1; overflow-y: auto;">
@@ -937,7 +943,7 @@
   <div id="editor-container" class="container">
     <!-- Project Context Badge -->
     <div class="ai-context-badge" id="ai-context-badge" style="display: none;">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6V2H8"/><path d="M15 11v2"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M20 16a2 2 0 0 1-2 2H8.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 4 20.286V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z"/><path d="M9 11v2"/></svg>
       <span>KI kennt: <strong id="context-project-name">-</strong></span>
     </div>
     
@@ -960,11 +966,11 @@
     <div class="editor-section">
       <span class="editor-label">Kategorie</span>
       <select id="category-select" style="width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-family: var(--font-stack); font-size: 13px; background: white; cursor: pointer;">
-        <option value="pages">📄 Seiten</option>
-        <option value="flows">🔀 User Flows</option>
-        <option value="components">📦 Component Specs</option>
-        <option value="tests">📋 UX Tests</option>
-        <option value="archive">🗄️ Archiv</option>
+        <option value="pages">Seiten</option>
+        <option value="flows">User Flows</option>
+        <option value="components">Component Specs</option>
+        <option value="tests">UX Tests</option>
+        <option value="archive">Archiv</option>
       </select>
     </div>
     
@@ -973,8 +979,8 @@
       <div class="textarea-wrapper">
         <textarea id="alt-text" placeholder="Was zeigt dieser Screen? Wofür wird er verwendet?"></textarea>
         <button class="inline-ai-btn" id="improve-description-btn">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-          KI
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></svg>
+          verbessern
         </button>
       </div>
     </div>
@@ -1009,6 +1015,21 @@ let mainKnowledgeBase = null;
 let currentOnboardingStep = 1;
 const TOTAL_STEPS = 6;
 
+// SVG Icons
+const ICONS = {
+  knowledgebase: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v14"/><path d="M16 12h2"/><path d="M16 8h2"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/><path d="M6 12h2"/><path d="M6 8h2"/></svg>',
+  screen: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" x2="2" y1="6" y2="6"/><line x1="22" x2="2" y1="18" y2="18"/><line x1="6" x2="6" y1="2" y2="22"/><line x1="18" x2="18" y1="2" y2="22"/></svg>',
+  users: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg>',
+  design: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z"/><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/></svg>',
+  ai: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6V2H8"/><path d="M15 11v2"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M20 16a2 2 0 0 1-2 2H8.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 4 20.286V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z"/><path d="M9 11v2"/></svg>',
+  sparkles: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></svg>',
+  project: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 19a5 5 0 0 1-5-5v8"/><path d="M9 20H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v5"/><circle cx="13" cy="12" r="2"/><circle cx="20" cy="19" r="2"/></svg>',
+  userflow: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="8" x="3" y="3" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect width="8" height="8" x="13" y="13" rx="2"/></svg>',
+  component: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.536 11.293a1 1 0 0 0 0 1.414l2.376 2.377a1 1 0 0 0 1.414 0l2.377-2.377a1 1 0 0 0 0-1.414l-2.377-2.377a1 1 0 0 0-1.414 0z"/><path d="M2.297 11.293a1 1 0 0 0 0 1.414l2.377 2.377a1 1 0 0 0 1.414 0l2.377-2.377a1 1 0 0 0 0-1.414L6.088 8.916a1 1 0 0 0-1.414 0z"/><path d="M8.916 17.912a1 1 0 0 0 0 1.415l2.377 2.376a1 1 0 0 0 1.414 0l2.377-2.376a1 1 0 0 0 0-1.415l-2.377-2.376a1 1 0 0 0-1.414 0z"/><path d="M8.916 4.674a1 1 0 0 0 0 1.414l2.377 2.376a1 1 0 0 0 1.414 0l2.377-2.376a1 1 0 0 0 0-1.414l-2.377-2.377a1 1 0 0 0-1.414 0z"/></svg>',
+  rocket: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>',
+  zap: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg>'
+};
+
 const containers = {
   search: document.getElementById('search-container'),
   browse: document.getElementById('browse-container'),
@@ -1024,11 +1045,11 @@ const navItems = {
 
 // Kategorie Icons
 const categoryIcons = {
-  pages: '📄',
-  flows: '🔀',
-  components: '📦',
-  tests: '📋',
-  archive: '🗄️'
+  pages: ICONS.screen,
+  flows: ICONS.userflow,
+  components: ICONS.component,
+  tests: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg>',
+  archive: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>'
 };
 
 // ============================================
@@ -1218,7 +1239,7 @@ async function improveWithAI(textareaId, type) {
   } finally {
     if (btn) {
       btn.disabled = false;
-      btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg> Mit KI verbessern';
+      btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></svg> verbessern';
     }
   }
 }
@@ -1280,7 +1301,7 @@ document.getElementById('improve-description-btn').onclick = async () => {
     console.error('AI request failed:', error);
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg> KI';
+    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></svg> verbessern';
   }
 };
 
@@ -1421,11 +1442,11 @@ function renderAISearchResults(aiResponse, query) {
   };
   
   const kbNames = {
-    'vision': '🎯 Projektvision',
-    'audience': '👥 Zielgruppe', 
-    'features': '⚡ Features',
-    'design': '🎨 Designsprache',
-    'terminology': '📖 Terminologie'
+    'vision': `<span class="icon">${ICONS.rocket}</span> Projektvision`,
+    'audience': `<span class="icon">${ICONS.users}</span> Zielgruppe`, 
+    'features': `<span class="icon">${ICONS.zap}</span> Features`,
+    'design': `<span class="icon">${ICONS.design}</span> Designsprache`,
+    'terminology': `<span class="icon">${ICONS.knowledgebase}</span> Terminologie`
   };
   
   const detectedKB = [];
@@ -1461,7 +1482,7 @@ function renderAISearchResults(aiResponse, query) {
   if (detectedKB.length > 0) {
     linksHTML += `
       <div class="ai-links-section">
-        <div class="ai-links-title">📚 Relevante Knowledge Base Einträge:</div>
+        <div class="ai-links-title"><span class="icon">${ICONS.knowledgebase}</span> Relevante Knowledge Base Einträge:</div>
         <div class="ai-links-container">
           ${detectedKB.map(kb => `<button class="ai-kb-link" data-kb="${kb.id}">${kb.name}</button>`).join('')}
         </div>
@@ -1472,9 +1493,9 @@ function renderAISearchResults(aiResponse, query) {
   if (detectedScreens.length > 0) {
     linksHTML += `
       <div class="ai-links-section">
-        <div class="ai-links-title">🖼 Relevante Screens:</div>
+        <div class="ai-links-title"><span class="icon">${ICONS.screen}</span> Relevante Screens:</div>
         <div class="ai-links-container">
-          ${detectedScreens.slice(0, 5).map(s => `<button class="ai-screen-link" data-sid="${s.sid}">🖼 ${s.name}</button>`).join('')}
+          ${detectedScreens.slice(0, 5).map(s => `<button class="ai-screen-link" data-sid="${s.sid}"><span class="icon icon-sm">${ICONS.screen}</span> ${s.name}</button>`).join('')}
         </div>
       </div>
     `;
@@ -1483,7 +1504,7 @@ function renderAISearchResults(aiResponse, query) {
   container.innerHTML = `
     <div class="ai-response-card">
       <div class="ai-response-header">
-        <span class="result-type project">🤖 KI-Antwort</span>
+        <span class="result-type project"><span class="icon icon-sm">${ICONS.ai}</span> KI-Antwort</span>
         <span style="font-size: 11px; color: var(--text-secondary);">für "${query}"</span>
       </div>
       <div class="ai-response-content">${formattedResponse}</div>
@@ -1524,10 +1545,10 @@ function renderSearchResults(results, query) {
     <div class="result-card" data-type="${r.type}" data-id="${r.id}">
       <div class="result-header">
         <span class="result-type ${r.type}">${
-          r.type === 'project' ? '🧠 Projekt' : 
-          r.type === 'screen' ? '🖼 Screen' : 
-          r.type === 'knowledge' ? '📚 Knowledge' : 
-          '📖 Glossar'
+          r.type === 'project' ? `<span class="icon icon-sm">${ICONS.project}</span> Projekt` : 
+          r.type === 'screen' ? `<span class="icon icon-sm">${ICONS.screen}</span> Screen` : 
+          r.type === 'knowledge' ? `<span class="icon icon-sm">${ICONS.knowledgebase}</span> Knowledge` : 
+          `<span class="icon icon-sm">${ICONS.knowledgebase}</span> Glossar`
         }</span>
         <span class="result-title">${r.title}</span>
       </div>
@@ -1581,17 +1602,17 @@ function renderProjectKnowledge() {
   const kb = mainKnowledgeBase;
   
   const knowledgeItems = [
-    { id: 'vision', icon: '🚀', title: 'Projekt & Vision', content: kb.vision, hasContent: !!kb.vision },
-    { id: 'audience', icon: '👥', title: 'Zielgruppe', content: kb.audience, hasContent: !!kb.audience },
-    { id: 'features', icon: '✨', title: 'Kernfeatures', content: kb.features, hasContent: !!kb.features },
-    { id: 'design', icon: '🎨', title: 'Designsprache', content: kb.design, hasContent: !!kb.design },
-    { id: 'terminology', icon: '📖', title: 'Terminologie', content: kb.terminology, hasContent: !!kb.terminology }
+    { id: 'vision', icon: ICONS.rocket, title: 'Projekt & Vision', content: kb.vision, hasContent: !!kb.vision },
+    { id: 'audience', icon: ICONS.users, title: 'Zielgruppe', content: kb.audience, hasContent: !!kb.audience },
+    { id: 'features', icon: ICONS.sparkles, title: 'Kernfeatures', content: kb.features, hasContent: !!kb.features },
+    { id: 'design', icon: ICONS.design, title: 'Designsprache', content: kb.design, hasContent: !!kb.design },
+    { id: 'terminology', icon: ICONS.knowledgebase, title: 'Terminologie', content: kb.terminology, hasContent: !!kb.terminology }
   ];
   
   let html = `
     <div class="kb-section">
       <div class="kb-section-header">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        <span class="icon">${ICONS.project}</span>
         ${kb.projectName}
       </div>
   `;
@@ -1601,7 +1622,7 @@ function renderProjectKnowledge() {
     
     html += `
       <div class="kb-item project-kb-item" data-kb-id="${item.id}">
-        <span style="font-size: 16px;">${item.icon}</span>
+        <span class="icon">${item.icon}</span>
         <div style="flex: 1; min-width: 0;">
           <div style="font-weight: 500;">${item.title}</div>
           <div style="font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
@@ -1627,17 +1648,17 @@ function showProjectKnowledgeDetail(id) {
   
   const kb = mainKnowledgeBase;
   const items = {
-    vision: { icon: '🚀', title: 'Projekt & Vision', content: kb.vision },
-    audience: { icon: '👥', title: 'Zielgruppe', content: kb.audience },
-    features: { icon: '✨', title: 'Kernfeatures', content: kb.features },
-    design: { icon: '🎨', title: 'Designsprache', content: kb.design },
-    terminology: { icon: '📖', title: 'Terminologie', content: kb.terminology }
+    vision: { icon: ICONS.rocket, title: 'Projekt & Vision', content: kb.vision },
+    audience: { icon: ICONS.users, title: 'Zielgruppe', content: kb.audience },
+    features: { icon: ICONS.sparkles, title: 'Kernfeatures', content: kb.features },
+    design: { icon: ICONS.design, title: 'Designsprache', content: kb.design },
+    terminology: { icon: ICONS.knowledgebase, title: 'Terminologie', content: kb.terminology }
   };
   
   const item = items[id];
   if (!item) return;
   
-  document.getElementById('detail-title').textContent = `${item.icon} ${item.title}`;
+  document.getElementById('detail-title').innerHTML = `<span class="icon">${item.icon}</span> ${item.title}`;
   
   // Format content with line breaks preserved
   const formattedContent = item.content
@@ -1697,7 +1718,7 @@ function renderScreensSection() {
     html += `
       <div class="kb-section">
         <div class="kb-section-header">
-          <span style="font-size: 14px;">${categoryIcons[category.id] || '📁'}</span>
+          <span class="icon">${categoryIcons[category.id] || ICONS.screen}</span>
           ${category.label} (${screens.length})
         </div>
         ${screens.map(screen => `
