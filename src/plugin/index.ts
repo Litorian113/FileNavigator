@@ -130,7 +130,9 @@ figma.ui.onmessage = (msg: PluginMessage) => {
         description: msg.description || '',
         features: msg.features || '',
         category: msg.category || 'pages',
-        nodeId: node.id
+        nodeId: node.id,
+        pageId: figma.currentPage.id,
+        pageName: figma.currentPage.name
       });
       
       figma.ui.postMessage({
@@ -229,19 +231,39 @@ figma.ui.onmessage = (msg: PluginMessage) => {
     const cachedScreen = findScreenBySid(msg.sid);
     
     if (cachedScreen) {
-      figma.getNodeByIdAsync(cachedScreen.nodeId).then(node => {
-        if (node) {
-          figma.currentPage.selection = [node as SceneNode];
-          figma.viewport.scrollAndZoomIntoView([node as SceneNode]);
-          figma.notify(`Found: ${node.name}`);
+      // Function to zoom to node after page switch
+      const zoomToNode = () => {
+        figma.getNodeByIdAsync(cachedScreen.nodeId).then(node => {
+          if (node) {
+            figma.currentPage.selection = [node as SceneNode];
+            figma.viewport.scrollAndZoomIntoView([node as SceneNode]);
+            figma.notify(`Found: ${node.name}`);
+          } else {
+            rebuildScreenCache().catch(console.error);
+            figma.notify("Frame was deleted or moved.");
+          }
+        });
+      };
+      
+      // Check if we need to switch pages
+      if (cachedScreen.pageId && cachedScreen.pageId !== figma.currentPage.id) {
+        // Find and switch to the target page
+        const targetPage = figma.root.children.find(page => page.id === cachedScreen.pageId);
+        if (targetPage) {
+          figma.setCurrentPageAsync(targetPage).then(() => {
+            figma.notify(`Switched to page: ${targetPage.name}`);
+            zoomToNode();
+          });
         } else {
-          rebuildScreenCache().catch(console.error);
-          figma.notify("Frame was deleted or moved.");
+          zoomToNode();
         }
-      });
+      } else {
+        zoomToNode();
+      }
       return;
     }
     
+    // Fallback: Search on current page
     const node = figma.currentPage.findOne(n => n.getPluginData('sid') === msg.sid);
     if (node) {
       figma.currentPage.selection = [node];

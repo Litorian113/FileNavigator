@@ -1,6 +1,6 @@
 import React from 'react';
 import { useApp, ViewType } from '../context/AppContext';
-import { SearchIcon, FolderIcon, EditIcon } from './shared/Icons';
+import { ChatIcon, FolderIcon, EditIcon } from './shared/Icons';
 import '../styles/components.css';
 
 interface NavItem {
@@ -10,7 +10,7 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { id: 'search', label: 'Search', icon: SearchIcon },
+  { id: 'search', label: 'Chat', icon: ChatIcon },
   { id: 'browse', label: 'Browse', icon: FolderIcon },
   { id: 'editor', label: 'Editor', icon: EditIcon },
 ];

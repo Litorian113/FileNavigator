@@ -9,8 +9,6 @@ export interface MainKnowledgeBase {
   terminology: string;
   createdAt: string;
   updatedAt: string;
-  /** Automatically learned insights from documented components */
-  learnedInsights?: string[];
   /** Number of components that contributed to the KB */
   contributingScreens?: number;
 }
@@ -18,8 +16,7 @@ export interface MainKnowledgeBase {
 /** Result of knowledge synthesis after component documentation */
 export interface KBSynthesisResult {
   shouldUpdate: boolean;
-  updatedFields: Partial<Pick<MainKnowledgeBase, 'features' | 'design' | 'terminology'>>;
-  newInsight?: string;
+  updatedFields: Partial<Pick<MainKnowledgeBase, 'features' | 'design' | 'terminology' | 'audience'>>;
   reason?: string;
 }
 
@@ -30,6 +27,8 @@ export interface ScreenData {
   features: string;
   category: string;
   nodeId: string;
+  pageId?: string;  // Page ID for cross-page navigation
+  pageName?: string; // Page name for display
 }
 
 export interface ScreenCategory {
@@ -48,6 +47,7 @@ export interface SearchResult {
   score?: number;
   category?: string;
   content?: string;  // Vollständiger Inhalt für DetailView
+  pageName?: string; // Figma page name for cross-page components
 }
 
 export interface KnowledgeItem {

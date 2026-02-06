@@ -217,6 +217,7 @@ export function AppProvider({ children }: AppProviderProps) {
       
       switch (msg.type) {
         case 'main-knowledge-base-loaded':
+        case 'main-knowledge-base-saved':
           dispatch({ type: 'SET_MAIN_KB', payload: msg.data });
           break;
         
@@ -328,7 +329,6 @@ CURRENT PROJECT KNOWLEDGE BASE:
 - Features: ${kb.features || 'Not defined'}
 - Design Language: ${kb.design || 'Not defined'}
 - Terminology: ${kb.terminology || 'Not defined'}
-${kb.learnedInsights?.length ? '- Previous Insights: ' + kb.learnedInsights.join('; ') : ''}
 
 NEW COMPONENT DOCUMENTED:
 - Name: "${screenName}"
@@ -336,26 +336,35 @@ NEW COMPONENT DOCUMENTED:
 - Description: ${screenData.description}
 - Features: ${screenData.features}
 
-TASK: Check if the new component contains information that should be added to the main knowledge base.
+TASK: Check if the new component contains information that should be INTEGRATED into the main knowledge base sections.
 
-Respond ONLY with a valid JSON object (no markdown, no explanation around it):
+Respond ONLY with a valid JSON object (no markdown code blocks, no explanation around it):
 {
   "shouldUpdate": true/false,
   "reason": "Brief explanation why update is needed/not needed",
-  "newInsight": "A brief insight that was learned (or null)",
   "updatedFields": {
-    "features": "Only if new features discovered - then the COMPLETE updated feature list, otherwise omit",
-    "design": "Only if new design patterns discovered - then the COMPLETE updated design description, otherwise omit",
-    "terminology": "Only if new terms discovered - then the COMPLETE updated terminology, otherwise omit"
+    "features": "Only if new features discovered - COMPLETE updated text, otherwise omit",
+    "design": "Only if new design patterns discovered - COMPLETE updated text, otherwise omit",
+    "terminology": "Only if new terms discovered - COMPLETE updated text, otherwise omit",
+    "audience": "Only if new audience insights discovered - COMPLETE updated text, otherwise omit"
   }
 }
 
-RULES:
+CRITICAL FORMATTING RULES:
+- Use \\n for line breaks in JSON string values
+- Use markdown formatting: ### for main headers, #### for sub-headers
+- Use numbered lists (1. 2. 3.) and bullet points (- item)
+- Keep paragraphs separated with \\n\\n
+- Example: "### Section Title\\n\\nParagraph text here.\\n\\n#### Subsection\\n\\n- Point 1\\n- Point 2"
+
+CONTENT RULES:
 - shouldUpdate = true ONLY if truly relevant new info was discovered
 - Ignore trivial or redundant info
-- For updates: Keep existing info and ADD new ones
-- Vision and Target Audience are NOT changed (only in onboarding)
-- Change max 1-2 fields per update`;
+- INTEGRATE new information naturally - don't just append
+- Keep existing structure and add new items in appropriate places
+- Vision is NOT changed (only in onboarding)
+- Change max 1-2 fields per update
+- Returned field values must contain the FULL updated text with proper formatting`;
 
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
@@ -369,8 +378,8 @@ RULES:
               { role: 'system', content: 'You are a precise Knowledge Base Manager. Respond ONLY with valid JSON.' },
               { role: 'user', content: prompt },
             ],
-            max_tokens: 1000,
-            temperature: 0.2,
+            max_tokens: 2000,
+            temperature: 0.3,
           }),
         });
         
@@ -389,10 +398,6 @@ RULES:
               ...kb,
               ...result.updatedFields,
               updatedAt: new Date().toISOString(),
-              learnedInsights: [
-                ...(kb.learnedInsights || []),
-                ...(result.newInsight ? [result.newInsight] : []),
-              ].slice(-20), // Keep max 20 insights
               contributingScreens: (kb.contributingScreens || 0) + 1,
             };
             
@@ -456,7 +461,7 @@ RULES:
             messages: [
               { 
                 role: 'system', 
-                content: 'You are an assistant for design documentation. You help with searching in a Figma project.\n\nRespond in English. If you find relevant components, mention them by name.\nIf you find info from the Knowledge Base, explain it.\n\nBe precise and helpful. If nothing matches, say so honestly.'
+                content: 'You are an assistant for design documentation. You help with searching in a Figma project.\n\nRespond in English. If you find relevant components, mention them by name.\nIf you find info from the Knowledge Base, explain it.\n\nUse markdown formatting:\n- Use **bold** for component names and key terms\n- Use bullet points for lists\n- Keep paragraphs short and readable\n\nBe precise and helpful. If nothing matches, say so honestly.'
               },
               { 
                 role: 'user', 
@@ -478,13 +483,13 @@ RULES:
           const lowerResponse = aiResponse.toLowerCase();
           const lowerQuery = query.toLowerCase();
           
-          // Keywords for Knowledge Base areas
+          // Keywords for Knowledge Base areas - only match if QUERY contains these
           const kbKeywords: Record<string, string[]> = {
-            'vision': ['vision', 'project goal', 'mission', 'purpose', 'what for'],
-            'audience': ['target audience', 'users', 'user', 'audience', 'who uses', 'for whom'],
-            'features': ['feature', 'function', 'what can', 'functionality', 'modules'],
-            'design': ['design', 'color', 'colors', 'typography', 'font', 'visual', 'style', 'spacing', 'ui'],
-            'terminology': ['terminology', 'terms', 'glossary', 'definition', 'what means', 'wording']
+            'vision': ['vision', 'goal', 'mission', 'purpose', 'why'],
+            'audience': ['audience', 'target', 'who', 'persona', 'user persona'],
+            'features': ['feature', 'function', 'what can', 'capability'],
+            'design': ['design', 'color', 'typography', 'font', 'visual', 'style', 'ui'],
+            'terminology': ['terminology', 'term', 'glossary', 'definition', 'meaning', 'what is']
           };
           
           const kbNames: Record<string, string> = {
@@ -495,44 +500,42 @@ RULES:
             'terminology': 'Terminology'
           };
           
-          // Find relevant KB areas
+          // Find relevant KB areas - only if query directly asks about it
           if (state.mainKnowledgeBase) {
             const kb = state.mainKnowledgeBase;
             Object.keys(kbKeywords).forEach(function(kbId) {
               const keywords = kbKeywords[kbId];
-              const hasMatch = keywords.some(function(kw) {
-                return lowerResponse.includes(kw) || lowerQuery.includes(kw);
+              // Only match if the QUERY contains the keyword (not just the response)
+              const queryMatch = keywords.some(function(kw) {
+                return lowerQuery.includes(kw);
               });
               
-              // Check if this area has content
               const kbContent = (kb as any)[kbId];
-              if (hasMatch && kbContent) {
+              if (queryMatch && kbContent) {
                 relevantResults.push({
                   type: 'project',
                   id: kbId,
                   title: kbNames[kbId],
                   snippet: kbContent.substring(0, 150) + (kbContent.length > 150 ? '...' : ''),
                   tags: [kb.projectName || 'Project'],
-                  // Store full content for DetailView
                   content: kbContent
                 } as SearchResult);
               }
             });
           }
           
-          // Find relevant components
+          // Find relevant components - only if AI explicitly mentions them by full name
           state.screens.forEach(function(screen) {
             const screenNameLower = screen.name.toLowerCase();
-            const screenWords = screenNameLower.split(/[-_\s]+/);
             
-            // Check if component name or important words appear in the response
-            const matchesName = lowerResponse.includes(screenNameLower);
-            const matchesWords = screenWords.some(function(word) {
-              return word.length > 3 && lowerResponse.includes(word);
-            });
-            const matchesCategory = screen.category && lowerResponse.includes(screen.category.toLowerCase());
+            // Only match if the full component name appears in the AI response
+            // This prevents matching partial words like "user" in "User-Persona"
+            const matchesFullName = lowerResponse.includes(screenNameLower);
             
-            if (matchesName || matchesWords || matchesCategory) {
+            // Also match if the query specifically asks about this component
+            const queryMentions = lowerQuery.includes(screenNameLower);
+            
+            if (matchesFullName || queryMentions) {
               relevantResults.push({
                 type: 'component',
                 id: screen.sid,
@@ -545,9 +548,14 @@ RULES:
             }
           });
           
+          // Limit results to most relevant (max 3 KB entries, max 3 components)
+          const kbResults = relevantResults.filter(r => r.type === 'project').slice(0, 2);
+          const componentResults = relevantResults.filter(r => r.type === 'component').slice(0, 3);
+          const limitedResults = [...kbResults, ...componentResults];
+          
           dispatch({
             type: 'SET_AI_RESPONSE',
-            payload: { query: query, response: aiResponse, results: relevantResults }
+            payload: { query: query, response: aiResponse, results: limitedResults }
           });
         } else {
           // Fallback auf normale Suche
@@ -574,13 +582,51 @@ RULES:
         throw new Error('No API key available');
       }
       
+      const formatInstructions = `
+
+FORMATTING RULES (IMPORTANT):
+- Use ### for main section headers
+- Use #### for sub-section headers  
+- Use numbered lists (1. 2. 3.) for ordered items
+- Use bullet points (- item) for unordered lists
+- Separate paragraphs with empty lines
+- Use **bold** for emphasis on key terms`;
+      
       const prompts: Record<string, string> = {
-        vision: `Improve and structure this product vision. Make it concise, clear and inspiring. Correct spelling errors. Respond only with the improved text, without introduction:\n\n${text}`,
-        audience: `Improve this target audience description. Make it more precise and structured. Correct spelling errors. Respond only with the improved text:\n\n${text}`,
-        features: `Structure this feature list as a clean list with • at the beginning of each line. Group similar features. Correct spelling errors. Respond only with the structured list:\n\n${text}`,
-        design: `Improve this design description. Make it more precise and professional. Correct spelling errors. Respond only with the improved text:\n\n${text}`,
-        terms: `Structure this glossary as a clean list in the format "• Term = Definition". Correct spelling errors. Respond only with the structured list:\n\n${text}`,
-        description: `You are a UX Writer. Improve this component description for documentation purposes. Project: ${state.mainKnowledgeBase?.projectName || 'Unknown'}. Make the description clear, precise and helpful for other designers. Respond only with the improved text:\n\n${text}`,
+        vision: `Improve and structure this product vision. Make it concise, clear and inspiring. Correct spelling errors.${formatInstructions}
+
+Respond only with the improved text, without introduction:\n\n${text}`,
+        audience: `Improve this target audience description. Make it more precise and well-structured.${formatInstructions}
+
+Use this structure:
+### Target Audience: [Name]
+Brief description
+
+#### Key Segments
+1. Segment 1
+2. Segment 2
+
+#### Key Characteristics
+- Characteristic 1
+- Characteristic 2
+
+Respond only with the improved text:\n\n${text}`,
+        features: `Structure this feature list clearly.${formatInstructions}
+
+Group related features under headers. Respond only with the structured text:\n\n${text}`,
+        design: `Improve this design language description. Make it precise and professional.${formatInstructions}
+
+Structure colors, typography, spacing etc. under clear headers. Respond only with the improved text:\n\n${text}`,
+        terms: `Structure this glossary/terminology clearly.${formatInstructions}
+
+Format each term as:
+**Term Name**
+Definition and explanation.
+
+Respond only with the structured text:\n\n${text}`,
+        description: `You are a UX Writer. Improve this component description for documentation purposes. Project: ${state.mainKnowledgeBase?.projectName || 'Unknown'}.${formatInstructions}
+
+Make the description clear, precise and helpful for other designers. Respond only with the improved text:\n\n${text}`,
       };
       
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -592,11 +638,11 @@ RULES:
         body: JSON.stringify({
           model: 'gpt-4o-mini',
           messages: [
-            { role: 'system', content: 'You are a helpful assistant for UX documentation. Always respond in English.' },
+            { role: 'system', content: 'You are a helpful assistant for UX documentation. Always respond in English. Use proper markdown formatting with headers, lists, and paragraphs.' },
             { role: 'user', content: prompts[type] || prompts.description },
           ],
-          max_tokens: 1500,
-          temperature: 0.7,
+          max_tokens: 2000,
+          temperature: 0.5,
         }),
       });
       

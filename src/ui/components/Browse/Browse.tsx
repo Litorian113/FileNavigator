@@ -2,6 +2,18 @@ import React from 'react';
 import { useApp } from '../../context/AppContext';
 import { SparklesIcon, getCategoryIcon, BookOpenIcon } from '../shared/Icons';
 
+// Strip markdown for clean preview text
+function stripMarkdown(text: string): string {
+  if (!text) return '';
+  return text
+    .replace(/#{1,6}\s*/g, '') // Remove # headers
+    .replace(/\*\*([^*]+)\*\*/g, '$1') // Remove **bold**
+    .replace(/\*([^*]+)\*/g, '$1') // Remove *italic*
+    .replace(/^[\-\*\u2022]\s*/gm, '') // Remove bullet points
+    .replace(/\n+/g, ' ') // Replace newlines with space
+    .trim();
+}
+
 export default function Browse() {
   const { state, actions } = useApp();
   const { mainKnowledgeBase, screens, categories } = state;
@@ -137,7 +149,7 @@ export default function Browse() {
                   <div style={{ fontWeight: 500 }}>{screen.name}</div>
                   {screen.description && (
                     <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>
-                      {screen.description.substring(0, 60)}
+                      {stripMarkdown(screen.description).substring(0, 60)}
                       {screen.description.length > 60 ? '...' : ''}
                     </div>
                   )}

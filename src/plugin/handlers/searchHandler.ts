@@ -134,7 +134,8 @@ export function searchKnowledgeBase(query: string): SearchResult[] {
         snippet: screenDesc.substring(0, 100) + (screenDesc.length > 100 ? '...' : ''),
         content: screenDesc,
         tags: featureTags,
-        category: screen.category || 'Component'
+        category: screen.category || 'Component',
+        pageName: screen.pageName
       });
     }
   }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
-import { ArrowLeftIcon, SparklesIcon } from '../shared/Icons';
+import { ArrowLeftIcon } from '../shared/Icons';
 
 // Formatiert inline Markdown (bold, italic)
 function formatInlineText(text: string | any): React.ReactNode {
@@ -59,7 +59,38 @@ function formatContent(content: string | any): React.ReactNode {
   };
   
   lines.forEach((line, index) => {
-    if (line.startsWith('**') && line.endsWith('**')) {
+    // Markdown headers ### and ####
+    if (line.startsWith('####')) {
+      flushList();
+      const headingText = line.replace(/^####\s*/, '');
+      elements.push(
+        <h5 key={`h4-${index}`} style={{ 
+          fontSize: 12, 
+          fontWeight: 600, 
+          marginTop: index > 0 ? 10 : 0, 
+          marginBottom: 4,
+          color: 'var(--text-primary)'
+        }}>
+          {headingText}
+        </h5>
+      );
+    }
+    else if (line.startsWith('###')) {
+      flushList();
+      const headingText = line.replace(/^###\s*/, '');
+      elements.push(
+        <h4 key={`h3-${index}`} style={{ 
+          fontSize: 13, 
+          fontWeight: 600, 
+          marginTop: index > 0 ? 12 : 0, 
+          marginBottom: 6,
+          color: 'var(--text-primary)'
+        }}>
+          {headingText}
+        </h4>
+      );
+    }
+    else if (line.startsWith('**') && line.endsWith('**')) {
       flushList();
       const headingText = line.slice(2, -2);
       elements.push(
@@ -146,19 +177,6 @@ export default function ProjectOverview() {
             </div>
           </div>
         ))}
-
-        {kb.learnedInsights && kb.learnedInsights.length > 0 && (
-          <div className="project-section">
-            <div className="project-section-label">
-              <SparklesIcon size={12} /> Learned Insights
-            </div>
-            <ul className="insights-list">
-              {kb.learnedInsights.map((insight, i) => (
-                <li key={i}>{insight}</li>
-              ))}
-            </ul>
-          </div>
-        )}
       </div>
 
       <div className="button-group">

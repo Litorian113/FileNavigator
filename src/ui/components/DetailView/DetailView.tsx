@@ -65,8 +65,39 @@ function formatContent(content: string | any): React.ReactNode {
   };
   
   lines.forEach((line, index) => {
+    // Markdown headers ### and ####
+    if (line.startsWith('####')) {
+      flushList();
+      const headingText = line.replace(/^####\s*/, '');
+      elements.push(
+        <h4 key={`h4-${index}`} style={{ 
+          fontSize: 12, 
+          fontWeight: 600, 
+          marginTop: index > 0 ? 12 : 0, 
+          marginBottom: 6,
+          color: 'var(--text-primary)'
+        }}>
+          {headingText}
+        </h4>
+      );
+    }
+    else if (line.startsWith('###')) {
+      flushList();
+      const headingText = line.replace(/^###\s*/, '');
+      elements.push(
+        <h3 key={`h3-${index}`} style={{ 
+          fontSize: 13, 
+          fontWeight: 600, 
+          marginTop: index > 0 ? 14 : 0, 
+          marginBottom: 8,
+          color: 'var(--text-primary)'
+        }}>
+          {headingText}
+        </h3>
+      );
+    }
     // Überschrift mit ** am Anfang und Ende
-    if (line.startsWith('**') && line.endsWith('**')) {
+    else if (line.startsWith('**') && line.endsWith('**')) {
       flushList();
       const headingText = line.slice(2, -2);
       elements.push(
@@ -144,6 +175,28 @@ export default function DetailView() {
         {/* Component specific view */}
         {detailItem.type === 'component' && (
           <>
+            {/* Category and Page info */}
+            <div style={{ 
+              fontSize: 11, 
+              color: 'var(--text-secondary)', 
+              marginBottom: 12,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              flexWrap: 'wrap'
+            }}>
+              {detailItem.category && (
+                <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  Category: <strong>{detailItem.category}</strong>
+                </span>
+              )}
+              {detailItem.pageName && (
+                <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  📄 Page: <strong>{detailItem.pageName}</strong>
+                </span>
+              )}
+            </div>
+            
             <div className="detail-section">
               <div className="detail-section-title">Description</div>
               <div style={{ marginBottom: 8, lineHeight: 1.5 }}>

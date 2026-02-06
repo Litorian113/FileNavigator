@@ -1,6 +1,95 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { SearchIcon, SparklesIcon } from '../shared/Icons';
+import { SearchIcon, SparklesIcon, LoadingSpinner, ChatIcon } from '../shared/Icons';
+
+// Formatiert AI Response mit Markdown (bold, italic, lists)
+function formatAIResponse(text: string): React.ReactNode {
+  if (!text) return '';
+  
+  const lines = text.split('\n');
+  const elements: React.ReactNode[] = [];
+  let currentList: React.ReactNode[] = [];
+  
+  const formatInline = (line: string): React.ReactNode => {
+    const parts: React.ReactNode[] = [];
+    let lastIndex = 0;
+    const regex = /\*\*([^*]+)\*\*/g;
+    let match;
+    
+    while ((match = regex.exec(line)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push(line.substring(lastIndex, match.index));
+      }
+      parts.push(<strong key={match.index}>{match[1]}</strong>);
+      lastIndex = match.index + match[0].length;
+    }
+    
+    if (lastIndex < line.length) {
+      parts.push(line.substring(lastIndex));
+    }
+    
+    return parts.length > 0 ? parts : line;
+  };
+  
+  const flushList = () => {
+    if (currentList.length > 0) {
+      elements.push(
+        <ul key={`list-${elements.length}`} style={{ margin: '8px 0', paddingLeft: 20 }}>
+          {currentList}
+        </ul>
+      );
+      currentList = [];
+    }
+  };
+  
+  lines.forEach((line, index) => {
+    const trimmedLine = line.trim();
+    
+    if (!trimmedLine) {
+      flushList();
+      return;
+    }
+    
+    // Headers #### 
+    if (trimmedLine.startsWith('#### ')) {
+      flushList();
+      elements.push(
+        <h5 key={`h4-${index}`} style={{ fontSize: 12, fontWeight: 600, marginTop: 12, marginBottom: 4 }}>
+          {formatInline(trimmedLine.substring(5))}
+        </h5>
+      );
+    }
+    // Headers ###
+    else if (trimmedLine.startsWith('### ')) {
+      flushList();
+      elements.push(
+        <h4 key={`h3-${index}`} style={{ fontSize: 13, fontWeight: 600, marginTop: 14, marginBottom: 6 }}>
+          {formatInline(trimmedLine.substring(4))}
+        </h4>
+      );
+    }
+    // Bullet points
+    else if (trimmedLine.startsWith('- ') || trimmedLine.startsWith('• ')) {
+      currentList.push(
+        <li key={`li-${index}`} style={{ marginBottom: 4 }}>
+          {formatInline(trimmedLine.substring(2))}
+        </li>
+      );
+    }
+    // Normal paragraph
+    else {
+      flushList();
+      elements.push(
+        <p key={`p-${index}`} style={{ marginBottom: 8 }}>
+          {formatInline(trimmedLine)}
+        </p>
+      );
+    }
+  });
+  
+  flushList();
+  return elements;
+}
 
 // Formatiert inline Markdown (bold) und entfernt ** für die Vorschau
 function formatSnippet(text: string | any): React.ReactNode {
@@ -28,14 +117,10 @@ function formatSnippet(text: string | any): React.ReactNode {
   return parts.length > 0 ? parts : textStr;
 }
 
-// Detects if the query is a question/contextual search
-function isContextualQuery(query: string): boolean {
-  const questionWords = ['where ', 'how ', 'what ', 'which ', 'why ', 'when ', 'who ', 'show me', 'find me', 'is there', 'do i have', 'do we have', '?'];
-  const lowerQuery = query.toLowerCase();
-  // Only use AI for actual questions (with question words) or longer queries that look like sentences
-  const hasQuestionWord = questionWords.some(word => lowerQuery.includes(word));
-  const looksLikeSentence = query.length > 40 && query.includes(' ');
-  return hasQuestionWord || looksLikeSentence;
+// Detects if query needs AI (always true now - we're a chat interface)
+function shouldUseAI(query: string): boolean {
+  // Always use AI for the chat interface
+  return true;
 }
 
 export default function Search() {
@@ -49,14 +134,13 @@ export default function Search() {
     setIsLoading(true);
     
     try {
-      if (isContextualQuery(query) && state.apiKey) {
-        // KI-Suche für kontextuelle Fragen
+      if (state.apiKey) {
+        // Always use AI search for chat interface
         await actions.aiSearch(query.trim());
         setIsLoading(false);
       } else {
-        // Normale Keyword-Suche - Loading wird erst bei Ergebnissen beendet
+        // Fallback to keyword search if no API key
         actions.search(query.trim());
-        // Loading bleibt an, bis Ergebnisse kommen (siehe useEffect unten)
       }
     } catch (e) {
       setIsLoading(false);
@@ -92,40 +176,40 @@ export default function Search() {
         <input
           type="text"
           className="search-input"
-          placeholder="Search knowledge base and components..."
+          placeholder="Ask about your project..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyPress={handleKeyPress}
         />
         <button className="search-btn" onClick={handleSearch}>
-          Search
+          Ask
         </button>
       </div>
 
       <div className="results-list">
         {isLoading ? (
           <div className="empty-state">
-            <SparklesIcon size={24} />
-            <p>Searching...</p>
+            <LoadingSpinner size={32} />
+            <p>Thinking...</p>
           </div>
         ) : state.aiResponse ? (
           <div className="ai-response-card">
             <div className="ai-response-header">
               <span className="result-type project">
-                <SparklesIcon size={14} /> KI-Antwort
+                <SparklesIcon size={14} /> AI Response
               </span>
               <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
-                für "{state.searchQuery}"
+                for "{state.searchQuery}"
               </span>
             </div>
-            <div className="ai-response-content" style={{ whiteSpace: 'pre-wrap' }}>
-              {state.aiResponse}
+            <div className="ai-response-content">
+              {formatAIResponse(state.aiResponse)}
             </div>
             
             {/* Knowledge Base Entries */}
             {state.searchResults.filter(r => r.type === 'project').length > 0 && (
               <div className="ai-links-section">
-                <div className="ai-links-title">📚 Relevant Knowledge Base Entries:</div>
+                <div className="ai-links-title">Relevant Knowledge Base Entries:</div>
                 <div className="ai-links-container">
                   {state.searchResults.filter(r => r.type === 'project').map((result, index) => (
                     <button
@@ -143,7 +227,7 @@ export default function Search() {
             {/* Components */}
             {state.searchResults.filter(r => r.type === 'component').length > 0 && (
               <div className="ai-links-section">
-                <div className="ai-links-title">🖼️ Relevant Components:</div>
+                <div className="ai-links-title">Relevant Components:</div>
                 <div className="ai-links-container">
                   {state.searchResults.filter(r => r.type === 'component').slice(0, 5).map((result, index) => (
                     <button
@@ -163,10 +247,10 @@ export default function Search() {
           </div>
         ) : state.searchResults.length === 0 ? (
           <div className="empty-state">
-            <SearchIcon size={48} />
-            <p>Search for design guidelines, components or terms</p>
+            <ChatIcon size={48} />
+            <p>Ask anything about your project</p>
             <p style={{ fontSize: 11, marginTop: 8 }}>
-              e.g. "Icon size navigation" or "Button"
+              e.g. "What are the primary colors?" or "Show me the nav component"
             </p>
           </div>
         ) : (
@@ -186,6 +270,16 @@ export default function Search() {
                   {result.category || getTypeLabel(result.type)}
                 </span>
                 <span className="result-title">{result.title}</span>
+                {result.pageName && (
+                  <span className="result-page" style={{
+                    fontSize: 10,
+                    color: 'var(--text-secondary)',
+                    marginLeft: 'auto',
+                    fontStyle: 'italic'
+                  }}>
+                    📄 {result.pageName}
+                  </span>
+                )}
               </div>
               <div className="result-snippet">{formatSnippet(result.snippet)}</div>
               {result.tags && result.tags.length > 0 && (
