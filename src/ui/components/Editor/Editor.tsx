@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
-import { SettingsIcon, SparklesIcon, MessageIcon, LoaderIcon } from '../shared/Icons';
+import { SettingsIcon, SparklesIcon, MessageIcon, LoaderIcon, CheckCircleIcon } from '../shared/Icons';
 
 export default function Editor() {
   const { state, actions } = useApp();
   const { selectedNode, mainKnowledgeBase, categories } = state;
+  const { isSynthesizing, lastSynthesisResult } = state;
 
   const [description, setDescription] = useState('');
   const [features, setFeatures] = useState('');
@@ -39,7 +40,7 @@ export default function Editor() {
 
   const handleImproveDescription = async () => {
     if (!description.trim()) {
-      alert('Bitte erst eine Beschreibung eingeben.');
+      alert('Please enter a description first.');
       return;
     }
 
@@ -49,7 +50,7 @@ export default function Editor() {
       setDescription(improved);
     } catch (error) {
       console.error('AI improvement failed:', error);
-      alert('Fehler bei der KI-Anfrage.');
+      alert('Error with AI request.');
     } finally {
       setIsImproving(false);
     }
@@ -61,41 +62,47 @@ export default function Editor() {
 
   return (
     <div className="container visible">
-      {/* AI Context Badge */}
-      {mainKnowledgeBase?.projectName && (
-        <div className="ai-context-badge">
-          <MessageIcon size={14} />
-          <span>
-            KI kennt: <strong>{mainKnowledgeBase.projectName}</strong>
-          </span>
+      {/* Knowledge Synthesis Feedback */}
+      {isSynthesizing && (
+        <div className="synthesis-banner synthesizing">
+          <LoaderIcon size={14} />
+          <span>Checking if knowledge base needs to be updated...</span>
+        </div>
+      )}
+      {lastSynthesisResult && !isSynthesizing && (
+        <div className={`synthesis-banner ${lastSynthesisResult.shouldUpdate ? 'updated' : 'no-update'}`}>
+          {lastSynthesisResult.shouldUpdate ? (
+            <>
+              <CheckCircleIcon size={14} />
+              <div className="synthesis-info">
+                <strong>Knowledge base updated</strong>
+                <span>{lastSynthesisResult.reason}</span>
+                {lastSynthesisResult.newInsight && (
+                  <span className="synthesis-insight">New insight: {lastSynthesisResult.newInsight}</span>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              <MessageIcon size={14} />
+              <span>No new insights — KB is up to date.</span>
+            </>
+          )}
+          <button className="synthesis-dismiss" onClick={actions.dismissSynthesisResult}>✕</button>
         </div>
       )}
 
-      {/* Project Settings Button */}
-      <button className="project-settings-btn" onClick={handleOpenProjectSettings}>
-        <SettingsIcon size={14} />
-        Projekt-Knowledge Base bearbeiten
-      </button>
-
       {/* Selected Frame Info */}
       <div className="editor-section">
-        <span className="editor-label">Ausgewählter Frame</span>
+        <span className="editor-label">Selected Frame</span>
         <div className={`editor-value ${selectedNode ? 'highlight' : ''}`}>
-          {selectedNode?.name || 'Kein Frame ausgewählt'}
-        </div>
-      </div>
-
-      {/* SID Display */}
-      <div className="editor-section">
-        <span className="editor-label">System ID (SID)</span>
-        <div className="editor-value sid-display">
-          {selectedNode?.sid || '-'}
+          {selectedNode?.name || 'No frame selected'}
         </div>
       </div>
 
       {/* Category Select */}
       <div className="editor-section">
-        <span className="editor-label">Kategorie</span>
+        <span className="editor-label">Category</span>
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
@@ -121,12 +128,12 @@ export default function Editor() {
 
       {/* Description */}
       <div className="editor-section">
-        <span className="editor-label">Beschreibung</span>
+        <span className="editor-label">Description</span>
         <div className="textarea-wrapper">
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Was zeigt dieser Screen? Wofür wird er verwendet?"
+            placeholder="What does this component show? What is it used for?"
             disabled={!selectedNode}
           />
           <button
@@ -137,12 +144,12 @@ export default function Editor() {
             {isImproving ? (
               <>
                 <LoaderIcon size={12} />
-                Verbessere...
+                Improving...
               </>
             ) : (
               <>
                 <SparklesIcon size={12} />
-                verbessern
+                improve
               </>
             )}
           </button>
@@ -156,10 +163,10 @@ export default function Editor() {
           type="text"
           value={features}
           onChange={(e) => setFeatures(e.target.value)}
-          placeholder="z.B. Login, SSO, Dark Mode"
+          placeholder="e.g. Login, SSO, Dark Mode"
           disabled={!selectedNode}
         />
-        <span className="features-hint">Kommagetrennte Keywords für die Suche</span>
+        <span className="features-hint">Comma-separated keywords for search</span>
       </div>
 
       {/* Buttons */}
@@ -169,14 +176,14 @@ export default function Editor() {
           onClick={handleCancel}
           disabled={!selectedNode}
         >
-          Abbrechen
+          Cancel
         </button>
         <button
           className="btn btn-primary"
           onClick={handleSave}
           disabled={!selectedNode}
         >
-          Speichern
+          Save
         </button>
       </div>
     </div>

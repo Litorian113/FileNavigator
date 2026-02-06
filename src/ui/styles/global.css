@@ -121,7 +121,7 @@ textarea:focus, input[type="text"]:focus {
 }
 
 textarea {
-  min-height: 80px;
+  min-height: 120px;
 }
 
 /* AI Button */

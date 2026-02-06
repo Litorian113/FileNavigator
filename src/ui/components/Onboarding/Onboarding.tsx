@@ -37,53 +37,53 @@ interface FormData {
 const steps: StepConfig[] = [
   {
     icon: RocketIcon,
-    question: 'Wie heißt dein Projekt?',
-    hint: 'Der Name und eine kurze Vision helfen der KI, den Kontext zu verstehen.',
+    question: 'What is your project called?',
+    hint: 'The name and a brief vision help the AI understand the context.',
     field: 'name',
-    placeholder: 'z.B. TeamChat Pro',
+    placeholder: 'e.g. TeamChat Pro',
     aiType: 'vision',
-    aiLabel: 'verbessern',
+    aiLabel: 'improve',
   },
   {
     icon: UsersIcon,
-    question: 'Wer nutzt das Produkt?',
-    hint: 'Beschreibe die Haupt-Zielgruppe(n) so genau wie möglich.',
+    question: 'Who uses the product?',
+    hint: 'Describe the main target audience(s) as precisely as possible.',
     field: 'audience',
-    placeholder: 'z.B. Remote-arbeitende Teams in mittelständischen Tech-Unternehmen...',
+    placeholder: 'e.g. Remote-working teams in mid-sized tech companies...',
     aiType: 'audience',
-    aiLabel: 'verbessern',
+    aiLabel: 'improve',
   },
   {
     icon: SparklesIcon,
-    question: 'Was sind die Kernfeatures?',
-    hint: 'Liste die wichtigsten Funktionen auf, die dein Produkt bietet.',
+    question: 'What are the core features?',
+    hint: 'List the most important features your product offers.',
     field: 'features',
-    placeholder: '• Echtzeit-Chat mit Threading\n• Videocalls\n• Dateifreigabe',
+    placeholder: '• Real-time chat with threading\n• Video calls\n• File sharing',
     aiType: 'features',
-    aiLabel: 'verbessern',
+    aiLabel: 'improve',
   },
   {
     icon: PaletteIcon,
-    question: 'Wie sieht und fühlt sich das Produkt an?',
-    hint: 'Beschreibe die Design-Prinzipien, Farbpalette, Tonalität.',
+    question: 'How does the product look and feel?',
+    hint: 'Describe the design principles, color palette, tonality.',
     field: 'design',
-    placeholder: 'z.B. Modern und clean mit viel Weißraum. Primärfarbe: Blau (#2563EB)...',
+    placeholder: 'e.g. Modern and clean with lots of whitespace. Primary color: Blue (#2563EB)...',
     aiType: 'design',
-    aiLabel: 'verbessern',
+    aiLabel: 'improve',
   },
   {
     icon: BookOpenIcon,
-    question: 'Gibt es wichtige Begriffe im Projekt?',
-    hint: 'Definiere projektspezifische Begriffe, die die KI kennen sollte.',
+    question: 'Are there important terms in the project?',
+    hint: 'Define project-specific terms that the AI should know.',
     field: 'terminology',
-    placeholder: '• Workspace = Ein Team-Bereich\n• Channel = Themenbasierter Chat-Raum',
+    placeholder: '• Workspace = A team area\n• Channel = Topic-based chat room',
     aiType: 'terms',
-    aiLabel: 'verbessern',
+    aiLabel: 'improve',
   },
   {
     icon: CheckCircleIcon,
-    question: 'Zusammenfassung',
-    hint: 'Überprüfe deine Eingaben. Du kannst sie jederzeit später bearbeiten.',
+    question: 'Summary',
+    hint: 'Review your entries. You can edit them anytime later.',
     field: 'name',
     placeholder: '',
     aiType: '',
@@ -142,7 +142,7 @@ export default function Onboarding({ initialData }: OnboardingProps) {
   const handleImprove = async (field: keyof FormData, type: string) => {
     const text = formData[field];
     if (!text.trim()) {
-      alert('Bitte erst Text eingeben, den die KI verbessern soll.');
+      alert('Please enter text first for the AI to improve.');
       return;
     }
 
@@ -152,7 +152,7 @@ export default function Onboarding({ initialData }: OnboardingProps) {
       setFormData((prev) => ({ ...prev, [field]: improved }));
     } catch (error) {
       console.error('AI improvement failed:', error);
-      alert('Fehler bei der KI-Anfrage.');
+      alert('Error with AI request.');
     } finally {
       setIsImproving(false);
     }
@@ -203,7 +203,7 @@ export default function Onboarding({ initialData }: OnboardingProps) {
               className="step-textarea"
               value={formData.vision}
               onChange={(e) => handleChange('vision', e.target.value)}
-              placeholder="Was ist die Vision? z.B. Eine moderne Team-Kommunikationsplattform für Remote-Teams..."
+              placeholder="What is the vision? e.g. A modern team communication platform for remote teams..."
             />
             <button
               className="ai-improve-btn"
@@ -213,12 +213,12 @@ export default function Onboarding({ initialData }: OnboardingProps) {
               {isImproving ? (
                 <>
                   <LoaderIcon size={14} />
-                  Verbessere...
+                  Improving...
                 </>
               ) : (
                 <>
                   <SparklesIcon size={14} />
-                  verbessern
+                  improve
                 </>
               )}
             </button>
@@ -239,7 +239,7 @@ export default function Onboarding({ initialData }: OnboardingProps) {
               {isImproving ? (
                 <>
                   <LoaderIcon size={14} />
-                  Verbessere...
+                  Improving...
                 </>
               ) : (
                 <>
@@ -259,19 +259,19 @@ export default function Onboarding({ initialData }: OnboardingProps) {
       <div>
         <div className="step-question">
           <CheckCircleIcon size={20} />
-          Zusammenfassung
+          Summary
         </div>
         <div className="step-hint">
-          Überprüfe deine Eingaben. Du kannst sie jederzeit später bearbeiten.
+          Review your entries. You can edit them anytime later.
         </div>
       </div>
       <div style={{ flex: 1, overflowY: 'auto' }}>
-        <SummarySection label="Projekt" value={formData.name} />
+        <SummarySection label="Project" value={formData.name} />
         <SummarySection label="Vision" value={formData.vision} />
-        <SummarySection label="Zielgruppe" value={formData.audience} />
-        <SummarySection label="Kernfeatures" value={formData.features} />
-        <SummarySection label="Designsprache" value={formData.design} />
-        <SummarySection label="Terminologie" value={formData.terminology} />
+        <SummarySection label="Target Audience" value={formData.audience} />
+        <SummarySection label="Core Features" value={formData.features} />
+        <SummarySection label="Design Language" value={formData.design} />
+        <SummarySection label="Terminology" value={formData.terminology} />
       </div>
     </div>
   );
@@ -282,9 +282,9 @@ export default function Onboarding({ initialData }: OnboardingProps) {
         <div className="onboarding-logo">
           <MoonIcon size={32} />
         </div>
-        <h1 className="onboarding-title">Projekt einrichten</h1>
+        <h1 className="onboarding-title">Set up project</h1>
         <p className="onboarding-subtitle">
-          Beschreibe dein Projekt, damit die KI dir besser helfen kann
+          Describe your project so the AI can help you better
         </p>
       </div>
 
@@ -294,11 +294,11 @@ export default function Onboarding({ initialData }: OnboardingProps) {
       <div className="onboarding-nav">
         {currentStep > 1 && (
           <button className="btn btn-secondary" onClick={handleBack}>
-            Zurück
+            Back
           </button>
         )}
         <button className="btn btn-primary" onClick={handleNext}>
-          {currentStep === TOTAL_STEPS ? '✓ Projekt speichern' : 'Weiter'}
+          {currentStep === TOTAL_STEPS ? '✓ Save project' : 'Next'}
         </button>
       </div>
     </div>

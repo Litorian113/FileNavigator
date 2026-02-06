@@ -7,6 +7,7 @@ import Search from './components/Search';
 import Browse from './components/Browse';
 import Editor from './components/Editor';
 import DetailView from './components/DetailView';
+import ProjectOverview from './components/ProjectOverview';
 import './styles/global.css';
 import './styles/components.css';
 
@@ -57,6 +58,7 @@ export default function App() {
       {currentView === 'browse' && <Browse />}
       {currentView === 'editor' && <Editor />}
       {currentView === 'detail' && <DetailView />}
+      {currentView === 'project' && <ProjectOverview />}
     </div>
   );
 }

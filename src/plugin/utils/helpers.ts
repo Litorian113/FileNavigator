@@ -1,5 +1,15 @@
 // Hilfsfunktionen für das Figma Plugin
 
+/** Node-Typen die dokumentiert werden können (Frames + Komponenten) */
+const DOCUMENTABLE_TYPES = ['FRAME', 'COMPONENT', 'COMPONENT_SET', 'INSTANCE'];
+
+/**
+ * Prüft ob ein Node dokumentierbar ist (Frame oder Komponente)
+ */
+export function isDocumentableNode(node: SceneNode): boolean {
+  return DOCUMENTABLE_TYPES.includes(node.type);
+}
+
 /**
  * Generiert eine eindeutige Screen-ID (SID)
  */

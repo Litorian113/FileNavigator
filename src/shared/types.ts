@@ -9,6 +9,18 @@ export interface MainKnowledgeBase {
   terminology: string;
   createdAt: string;
   updatedAt: string;
+  /** Automatically learned insights from documented components */
+  learnedInsights?: string[];
+  /** Number of components that contributed to the KB */
+  contributingScreens?: number;
+}
+
+/** Result of knowledge synthesis after component documentation */
+export interface KBSynthesisResult {
+  shouldUpdate: boolean;
+  updatedFields: Partial<Pick<MainKnowledgeBase, 'features' | 'design' | 'terminology'>>;
+  newInsight?: string;
+  reason?: string;
 }
 
 export interface ScreenData {
@@ -27,7 +39,7 @@ export interface ScreenCategory {
 }
 
 export interface SearchResult {
-  type: 'project' | 'screen' | 'knowledge' | 'glossary';
+  type: 'project' | 'component' | 'knowledge' | 'glossary';
   id: string;
   title: string;
   snippet: string;

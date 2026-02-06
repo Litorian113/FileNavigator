@@ -10,7 +10,7 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { id: 'search', label: 'Suche', icon: SearchIcon },
+  { id: 'search', label: 'Search', icon: SearchIcon },
   { id: 'browse', label: 'Browse', icon: FolderIcon },
   { id: 'editor', label: 'Editor', icon: EditIcon },
 ];

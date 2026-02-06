@@ -4,13 +4,13 @@ import { postToUI } from '../utils/helpers';
 let mainKnowledgeBase: MainKnowledgeBase | null = null;
 
 /**
- * Lädt die Main Knowledge Base aus dem clientStorage
+ * Loads the Main Knowledge Base from clientStorage
  */
 export async function loadMainKnowledgeBase(apiKey: string): Promise<MainKnowledgeBase | null> {
   try {
     const data = await figma.clientStorage.getAsync('mainKnowledgeBase');
     mainKnowledgeBase = data || null;
-    console.log('Main Knowledge Base geladen:', mainKnowledgeBase?.projectName || 'Keine');
+    console.log('Main Knowledge Base loaded:', mainKnowledgeBase?.projectName || 'None');
     
     postToUI({
       type: 'main-knowledge-base-loaded',
@@ -19,7 +19,7 @@ export async function loadMainKnowledgeBase(apiKey: string): Promise<MainKnowled
     
     return mainKnowledgeBase;
   } catch (error) {
-    console.error('Fehler beim Laden der Main Knowledge Base:', error);
+    console.error('Error loading Main Knowledge Base:', error);
     postToUI({
       type: 'main-knowledge-base-loaded',
       data: null
@@ -29,27 +29,27 @@ export async function loadMainKnowledgeBase(apiKey: string): Promise<MainKnowled
 }
 
 /**
- * Speichert die Main Knowledge Base im clientStorage
+ * Saves the Main Knowledge Base to clientStorage
  */
 export async function saveMainKnowledgeBase(data: MainKnowledgeBase, apiKey: string): Promise<void> {
   try {
     await figma.clientStorage.setAsync('mainKnowledgeBase', data);
     mainKnowledgeBase = data;
-    console.log('Main Knowledge Base gespeichert:', data.projectName);
-    figma.notify(`Projekt "${data.projectName}" gespeichert! ✓`);
+    console.log('Main Knowledge Base saved:', data.projectName);
+    figma.notify(`Project "${data.projectName}" saved! ✓`);
     
     postToUI({
       type: 'main-knowledge-base-saved',
       data: mainKnowledgeBase
     }, apiKey);
   } catch (error) {
-    console.error('Fehler beim Speichern:', error);
-    figma.notify('Fehler beim Speichern des Projekts.');
+    console.error('Error saving:', error);
+    figma.notify('Error saving project.');
   }
 }
 
 /**
- * Gibt die aktuelle Main Knowledge Base zurück
+ * Returns the current Main Knowledge Base
  */
 export function getMainKnowledgeBase(): MainKnowledgeBase | null {
   return mainKnowledgeBase;

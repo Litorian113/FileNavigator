@@ -3,7 +3,8 @@ import {
   MainKnowledgeBase, 
   ScreenData, 
   ScreenCategory, 
-  SearchResult 
+  SearchResult,
+  KBSynthesisResult 
 } from '../../shared/types';
 import { KnowledgeBase } from '../../plugin/data/knowledgeBase';
 
@@ -11,7 +12,7 @@ import { KnowledgeBase } from '../../plugin/data/knowledgeBase';
 // STATE TYPES
 // ============================================
 
-export type ViewType = 'search' | 'browse' | 'editor' | 'detail' | 'onboarding';
+export type ViewType = 'search' | 'browse' | 'editor' | 'detail' | 'onboarding' | 'project';
 
 interface AppState {
   // Navigation
@@ -47,6 +48,10 @@ interface AppState {
   
   // Loading states
   isLoading: boolean;
+  
+  // Knowledge Synthesis
+  isSynthesizing: boolean;
+  lastSynthesisResult: KBSynthesisResult | null;
 }
 
 type AppAction =
@@ -62,7 +67,9 @@ type AppAction =
   | { type: 'CLEAR_AI_RESPONSE' }
   | { type: 'SET_DETAIL_ITEM'; payload: any }
   | { type: 'SET_API_KEY'; payload: string }
-  | { type: 'SET_LOADING'; payload: boolean };
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_SYNTHESIZING'; payload: boolean }
+  | { type: 'SET_SYNTHESIS_RESULT'; payload: KBSynthesisResult | null };
 
 // ============================================
 // INITIAL STATE
@@ -82,6 +89,8 @@ const initialState: AppState = {
   detailItem: null,
   apiKey: '',
   isLoading: true,
+  isSynthesizing: false,
+  lastSynthesisResult: null,
 };
 
 // ============================================
@@ -125,7 +134,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
         ...state, 
         searchQuery: action.payload.query,
         searchResults: action.payload.results,
-        aiResponse: null  // Lösche AI-Antwort bei normaler Suche
+        aiResponse: null  // Clear AI response on normal search
       };
     
     case 'SET_AI_RESPONSE':
@@ -148,6 +157,12 @@ function appReducer(state: AppState, action: AppAction): AppState {
     case 'SET_LOADING':
       return { ...state, isLoading: action.payload };
     
+    case 'SET_SYNTHESIZING':
+      return { ...state, isSynthesizing: action.payload };
+    
+    case 'SET_SYNTHESIS_RESULT':
+      return { ...state, lastSynthesisResult: action.payload };
+    
     default:
       return state;
   }
@@ -164,7 +179,10 @@ interface AppContextType {
     navigateTo: (view: ViewType) => void;
     goBack: () => void;
     saveScreenData: (data: { description: string; features: string; category: string }) => void;
+    deleteScreen: (sid: string) => void;
     saveMainKB: (kb: MainKnowledgeBase) => void;
+    synthesizeKnowledge: (screenName: string, screenData: { description: string; features: string; category: string }) => Promise<void>;
+    dismissSynthesisResult: () => void;
     search: (query: string) => void;
     aiSearch: (query: string) => Promise<void>;
     zoomToSid: (sid: string) => void;
@@ -274,11 +292,127 @@ export function AppProvider({ children }: AppProviderProps) {
         category: data.category,
         linkedKnowledge: state.selectedNode?.linkedKnowledge || '',
       });
+      
+      // Trigger Knowledge Synthesis in background
+      if (state.mainKnowledgeBase && state.apiKey && state.selectedNode) {
+        actions.synthesizeKnowledge(state.selectedNode.name, data);
+      }
+    },
+    
+    deleteScreen: (sid: string) => {
+      postToPlugin({
+        type: 'delete-screen-data',
+        sid: sid,
+      });
     },
     
     saveMainKB: (kb: MainKnowledgeBase) => {
       postToPlugin({ type: 'save-main-knowledge-base', data: kb });
       dispatch({ type: 'SET_MAIN_KB', payload: kb });
+    },
+    
+    synthesizeKnowledge: async (screenName: string, screenData: { description: string; features: string; category: string }) => {
+      const kb = state.mainKnowledgeBase;
+      if (!kb || !state.apiKey) return;
+      
+      dispatch({ type: 'SET_SYNTHESIZING', payload: true });
+      dispatch({ type: 'SET_SYNTHESIS_RESULT', payload: null });
+      
+      try {
+        const prompt = `You are a Knowledge Base Manager for a design project.
+
+CURRENT PROJECT KNOWLEDGE BASE:
+- Project: ${kb.projectName}
+- Vision: ${kb.vision || 'Not defined'}
+- Target Audience: ${kb.audience || 'Not defined'}
+- Features: ${kb.features || 'Not defined'}
+- Design Language: ${kb.design || 'Not defined'}
+- Terminology: ${kb.terminology || 'Not defined'}
+${kb.learnedInsights?.length ? '- Previous Insights: ' + kb.learnedInsights.join('; ') : ''}
+
+NEW COMPONENT DOCUMENTED:
+- Name: "${screenName}"
+- Category: ${screenData.category}
+- Description: ${screenData.description}
+- Features: ${screenData.features}
+
+TASK: Check if the new component contains information that should be added to the main knowledge base.
+
+Respond ONLY with a valid JSON object (no markdown, no explanation around it):
+{
+  "shouldUpdate": true/false,
+  "reason": "Brief explanation why update is needed/not needed",
+  "newInsight": "A brief insight that was learned (or null)",
+  "updatedFields": {
+    "features": "Only if new features discovered - then the COMPLETE updated feature list, otherwise omit",
+    "design": "Only if new design patterns discovered - then the COMPLETE updated design description, otherwise omit",
+    "terminology": "Only if new terms discovered - then the COMPLETE updated terminology, otherwise omit"
+  }
+}
+
+RULES:
+- shouldUpdate = true ONLY if truly relevant new info was discovered
+- Ignore trivial or redundant info
+- For updates: Keep existing info and ADD new ones
+- Vision and Target Audience are NOT changed (only in onboarding)
+- Change max 1-2 fields per update`;
+
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${state.apiKey}`,
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: [
+              { role: 'system', content: 'You are a precise Knowledge Base Manager. Respond ONLY with valid JSON.' },
+              { role: 'user', content: prompt },
+            ],
+            max_tokens: 1000,
+            temperature: 0.2,
+          }),
+        });
+        
+        const data = await response.json();
+        
+        if (data.choices && data.choices[0]) {
+          let content = data.choices[0].message.content.trim();
+          // Remove potential Markdown code blocks
+          content = content.replace(/^```(?:json)?\s*/, '').replace(/\s*```$/, '');
+          
+          const result: KBSynthesisResult = JSON.parse(content);
+          
+          if (result.shouldUpdate && Object.keys(result.updatedFields).length > 0) {
+            // Update the Main KB
+            const updatedKB: MainKnowledgeBase = {
+              ...kb,
+              ...result.updatedFields,
+              updatedAt: new Date().toISOString(),
+              learnedInsights: [
+                ...(kb.learnedInsights || []),
+                ...(result.newInsight ? [result.newInsight] : []),
+              ].slice(-20), // Keep max 20 insights
+              contributingScreens: (kb.contributingScreens || 0) + 1,
+            };
+            
+            // Save KB
+            postToPlugin({ type: 'save-main-knowledge-base', data: updatedKB });
+            dispatch({ type: 'SET_MAIN_KB', payload: updatedKB });
+            dispatch({ type: 'SET_SYNTHESIS_RESULT', payload: result });
+          } else {
+            dispatch({ type: 'SET_SYNTHESIS_RESULT', payload: { shouldUpdate: false, updatedFields: {}, reason: result.reason || 'No relevant new information.' } });
+          }
+        }
+      } catch (error) {
+        console.error('Knowledge synthesis failed:', error);
+      } finally {
+        dispatch({ type: 'SET_SYNTHESIZING', payload: false });
+      }
+    },
+    
+    dismissSynthesisResult: () => {
+      dispatch({ type: 'SET_SYNTHESIS_RESULT', payload: null });
     },
     
     search: (query: string) => {
@@ -293,21 +427,21 @@ export function AppProvider({ children }: AppProviderProps) {
         return;
       }
       
-      // Baue Kontext aus Main KB + allen Screens
-      let context = '# Projekt-Knowledge Base\n';
+      // Build context from Main KB + all components
+      let context = '# Project Knowledge Base\n';
       if (state.mainKnowledgeBase) {
         const kb = state.mainKnowledgeBase;
-        context += 'Projektname: ' + (kb.projectName || 'Unbekannt') + '\n';
-        context += 'Vision: ' + (kb.vision || 'Keine Vision') + '\n';
-        context += 'Zielgruppe: ' + (kb.audience || 'Keine Zielgruppe') + '\n';
-        context += 'Features: ' + (kb.features || 'Keine Features') + '\n';
-        context += 'Designsprache: ' + (kb.design || 'Keine Designsprache') + '\n';
-        context += 'Terminologie: ' + (kb.terminology || 'Keine Terminologie') + '\n\n';
+        context += 'Project name: ' + (kb.projectName || 'Unknown') + '\n';
+        context += 'Vision: ' + (kb.vision || 'No vision') + '\n';
+        context += 'Target audience: ' + (kb.audience || 'No target audience') + '\n';
+        context += 'Features: ' + (kb.features || 'No features') + '\n';
+        context += 'Design language: ' + (kb.design || 'No design language') + '\n';
+        context += 'Terminology: ' + (kb.terminology || 'No terminology') + '\n\n';
       }
       
-      context += '# Dokumentierte Screens (' + state.screens.length + '):\n';
+      context += '# Documented Components (' + state.screens.length + '):\n';
       state.screens.forEach(function(screen) {
-        context += '- "' + screen.name + '" (Kategorie: ' + (screen.category || 'Keine') + '): ' + (screen.description || 'Keine Beschreibung') + '\n';
+        context += '- "' + screen.name + '" (Category: ' + (screen.category || 'None') + '): ' + (screen.description || 'No description') + '\n';
       });
       
       try {
@@ -322,11 +456,11 @@ export function AppProvider({ children }: AppProviderProps) {
             messages: [
               { 
                 role: 'system', 
-                content: 'Du bist ein Assistent für Design-Dokumentation. Du hilfst bei der Suche in einem Figma-Projekt.\n\nAntworte auf Deutsch. Wenn du relevante Screens findest, erwähne sie mit Namen.\nWenn du Infos aus der Knowledge Base findest, erkläre sie.\n\nSei präzise und hilfreich. Wenn nichts passt, sag das ehrlich.'
+                content: 'You are an assistant for design documentation. You help with searching in a Figma project.\n\nRespond in English. If you find relevant components, mention them by name.\nIf you find info from the Knowledge Base, explain it.\n\nBe precise and helpful. If nothing matches, say so honestly.'
               },
               { 
                 role: 'user', 
-                content: 'Kontext über das Projekt:\n' + context + '\n\nFrage: ' + query 
+                content: 'Context about the project:\n' + context + '\n\nQuestion: ' + query 
               }
             ],
             max_tokens: 500,
@@ -344,24 +478,24 @@ export function AppProvider({ children }: AppProviderProps) {
           const lowerResponse = aiResponse.toLowerCase();
           const lowerQuery = query.toLowerCase();
           
-          // Keywords für Knowledge-Base-Bereiche
+          // Keywords for Knowledge Base areas
           const kbKeywords: Record<string, string[]> = {
-            'vision': ['vision', 'ziel des projekts', 'mission', 'zweck', 'wofür'],
-            'audience': ['zielgruppe', 'nutzer', 'user', 'publikum', 'wer nutzt', 'für wen'],
-            'features': ['feature', 'funktion', 'was kann', 'funktionalität', 'module'],
-            'design': ['design', 'farbe', 'farben', 'typografie', 'schrift', 'visual', 'stil', 'color', 'spacing', 'ui'],
-            'terminology': ['terminologie', 'begriffe', 'glossar', 'definition', 'was bedeutet', 'wording']
+            'vision': ['vision', 'project goal', 'mission', 'purpose', 'what for'],
+            'audience': ['target audience', 'users', 'user', 'audience', 'who uses', 'for whom'],
+            'features': ['feature', 'function', 'what can', 'functionality', 'modules'],
+            'design': ['design', 'color', 'colors', 'typography', 'font', 'visual', 'style', 'spacing', 'ui'],
+            'terminology': ['terminology', 'terms', 'glossary', 'definition', 'what means', 'wording']
           };
           
           const kbNames: Record<string, string> = {
-            'vision': 'Projekt & Vision',
-            'audience': 'Zielgruppe',
-            'features': 'Kernfeatures',
-            'design': 'Designsprache',
-            'terminology': 'Terminologie'
+            'vision': 'Project & Vision',
+            'audience': 'Target Audience',
+            'features': 'Core Features',
+            'design': 'Design Language',
+            'terminology': 'Terminology'
           };
           
-          // Finde relevante KB-Bereiche
+          // Find relevant KB areas
           if (state.mainKnowledgeBase) {
             const kb = state.mainKnowledgeBase;
             Object.keys(kbKeywords).forEach(function(kbId) {
@@ -370,7 +504,7 @@ export function AppProvider({ children }: AppProviderProps) {
                 return lowerResponse.includes(kw) || lowerQuery.includes(kw);
               });
               
-              // Prüfe ob dieser Bereich Inhalt hat
+              // Check if this area has content
               const kbContent = (kb as any)[kbId];
               if (hasMatch && kbContent) {
                 relevantResults.push({
@@ -378,20 +512,20 @@ export function AppProvider({ children }: AppProviderProps) {
                   id: kbId,
                   title: kbNames[kbId],
                   snippet: kbContent.substring(0, 150) + (kbContent.length > 150 ? '...' : ''),
-                  tags: [kb.projectName || 'Projekt'],
-                  // Speichere den vollständigen Inhalt für die DetailView
+                  tags: [kb.projectName || 'Project'],
+                  // Store full content for DetailView
                   content: kbContent
                 } as SearchResult);
               }
             });
           }
           
-          // Finde relevante Screens
+          // Find relevant components
           state.screens.forEach(function(screen) {
             const screenNameLower = screen.name.toLowerCase();
             const screenWords = screenNameLower.split(/[-_\s]+/);
             
-            // Prüfe ob Screen-Name oder wichtige Wörter in der Antwort vorkommen
+            // Check if component name or important words appear in the response
             const matchesName = lowerResponse.includes(screenNameLower);
             const matchesWords = screenWords.some(function(word) {
               return word.length > 3 && lowerResponse.includes(word);
@@ -400,7 +534,7 @@ export function AppProvider({ children }: AppProviderProps) {
             
             if (matchesName || matchesWords || matchesCategory) {
               relevantResults.push({
-                type: 'screen',
+                type: 'component',
                 id: screen.sid,
                 sid: screen.sid,
                 title: screen.name,
@@ -437,16 +571,16 @@ export function AppProvider({ children }: AppProviderProps) {
     
     improveWithAI: async (text: string, type: string): Promise<string> => {
       if (!state.apiKey) {
-        throw new Error('Kein API Key verfügbar');
+        throw new Error('No API key available');
       }
       
       const prompts: Record<string, string> = {
-        vision: `Verbessere und strukturiere diese Produkt-Vision. Mache sie prägnant, klar und inspirierend. Korrigiere Rechtschreibfehler. Antworte nur mit dem verbesserten Text, ohne Einleitung:\n\n${text}`,
-        audience: `Verbessere diese Zielgruppen-Beschreibung. Mache sie präziser und strukturierter. Korrigiere Rechtschreibfehler. Antworte nur mit dem verbesserten Text:\n\n${text}`,
-        features: `Strukturiere diese Feature-Liste als saubere Aufzählung mit • am Anfang jeder Zeile. Gruppiere ähnliche Features. Korrigiere Rechtschreibfehler. Antworte nur mit der strukturierten Liste:\n\n${text}`,
-        design: `Verbessere diese Design-Beschreibung. Mache sie präziser und professioneller. Korrigiere Rechtschreibfehler. Antworte nur mit dem verbesserten Text:\n\n${text}`,
-        terms: `Strukturiere dieses Glossar als saubere Liste im Format "• Begriff = Definition". Korrigiere Rechtschreibfehler. Antworte nur mit der strukturierten Liste:\n\n${text}`,
-        description: `Du bist ein UX Writer. Verbessere diese Screen-Beschreibung für Dokumentationszwecke. Projekt: ${state.mainKnowledgeBase?.projectName || 'Unbekannt'}. Mache die Beschreibung klar, präzise und hilfreich für andere Designer. Antworte nur mit dem verbesserten Text:\n\n${text}`,
+        vision: `Improve and structure this product vision. Make it concise, clear and inspiring. Correct spelling errors. Respond only with the improved text, without introduction:\n\n${text}`,
+        audience: `Improve this target audience description. Make it more precise and structured. Correct spelling errors. Respond only with the improved text:\n\n${text}`,
+        features: `Structure this feature list as a clean list with • at the beginning of each line. Group similar features. Correct spelling errors. Respond only with the structured list:\n\n${text}`,
+        design: `Improve this design description. Make it more precise and professional. Correct spelling errors. Respond only with the improved text:\n\n${text}`,
+        terms: `Structure this glossary as a clean list in the format "• Term = Definition". Correct spelling errors. Respond only with the structured list:\n\n${text}`,
+        description: `You are a UX Writer. Improve this component description for documentation purposes. Project: ${state.mainKnowledgeBase?.projectName || 'Unknown'}. Make the description clear, precise and helpful for other designers. Respond only with the improved text:\n\n${text}`,
       };
       
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -458,7 +592,7 @@ export function AppProvider({ children }: AppProviderProps) {
         body: JSON.stringify({
           model: 'gpt-4o-mini',
           messages: [
-            { role: 'system', content: 'Du bist ein hilfreicher Assistent für UX-Dokumentation. Antworte immer auf Deutsch.' },
+            { role: 'system', content: 'You are a helpful assistant for UX documentation. Always respond in English.' },
             { role: 'user', content: prompts[type] || prompts.description },
           ],
           max_tokens: 1500,

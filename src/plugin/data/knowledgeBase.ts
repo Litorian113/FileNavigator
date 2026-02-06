@@ -26,56 +26,56 @@ export const KNOWLEDGE_BASE: KnowledgeBase = {
     foundations: [
       {
         id: "kb-colors",
-        title: "Farbsystem",
+        title: "Color System",
         category: "foundations",
         content: {
-          overview: "Semantisches Farbsystem basierend auf Funktionen.",
-          primary: { hex: "#2563EB", usage: "Primäre Aktionen, Links, Fokus-States" },
+          overview: "Semantic color system based on functions.",
+          primary: { hex: "#2563EB", usage: "Primary actions, links, focus states" },
           semantic: [
-            { name: "Success", hex: "#10B981", usage: "Erfolgreiche Aktionen" },
-            { name: "Warning", hex: "#F59E0B", usage: "Warnungen" },
-            { name: "Error", hex: "#EF4444", usage: "Fehler, kritische Zustände" }
+            { name: "Success", hex: "#10B981", usage: "Successful actions" },
+            { name: "Warning", hex: "#F59E0B", usage: "Warnings" },
+            { name: "Error", hex: "#EF4444", usage: "Errors, critical states" }
           ],
           rules: [
-            "Kontrast-Ratio mindestens 4.5:1 (WCAG AA)",
-            "Farbe nie als einziger Informationsträger"
+            "Contrast ratio at least 4.5:1 (WCAG AA)",
+            "Never use color as the only information carrier"
           ]
         },
-        tags: ["farben", "colors", "branding", "kontrast"]
+        tags: ["colors", "branding", "contrast", "palette"]
       },
       {
         id: "kb-typography",
-        title: "Typografie",
+        title: "Typography",
         category: "foundations",
         content: {
-          overview: "Inter als primäre Schrift.",
+          overview: "Inter as the primary font.",
           fontFamily: { primary: "Inter", mono: "JetBrains Mono" },
           scale: [
-            { name: "H1", size: "32px", weight: "700", usage: "Seitentitel" },
-            { name: "H2", size: "24px", weight: "600", usage: "Section Headers" },
-            { name: "Body", size: "16px", weight: "400", usage: "Fließtext" },
-            { name: "Caption", size: "12px", weight: "400", usage: "Labels, Hinweise" }
+            { name: "H1", size: "32px", weight: "700", usage: "Page titles" },
+            { name: "H2", size: "24px", weight: "600", usage: "Section headers" },
+            { name: "Body", size: "16px", weight: "400", usage: "Body text" },
+            { name: "Caption", size: "12px", weight: "400", usage: "Labels, hints" }
           ],
-          rules: ["Max Zeilenlänge: 65-75 Zeichen", "Keine Schrift unter 12px"]
+          rules: ["Max line length: 65-75 characters", "No font below 12px"]
         },
-        tags: ["typografie", "schrift", "font", "text", "headlines"]
+        tags: ["typography", "font", "text", "headlines"]
       },
       {
         id: "kb-spacing",
         title: "Spacing & Grid",
         category: "foundations",
         content: {
-          overview: "8px Grid-System für konsistente Abstände.",
+          overview: "8px grid system for consistent spacing.",
           baseUnit: "8px",
           scale: [
-            { name: "space-1", value: "4px", usage: "Micro-Spacing" },
-            { name: "space-2", value: "8px", usage: "Input Padding" },
-            { name: "space-4", value: "16px", usage: "Card Padding" },
-            { name: "space-6", value: "24px", usage: "Section Padding" },
-            { name: "space-8", value: "32px", usage: "Große Sections" }
+            { name: "space-1", value: "4px", usage: "Micro-spacing" },
+            { name: "space-2", value: "8px", usage: "Input padding" },
+            { name: "space-4", value: "16px", usage: "Card padding" },
+            { name: "space-6", value: "24px", usage: "Section padding" },
+            { name: "space-8", value: "32px", usage: "Large sections" }
           ]
         },
-        tags: ["spacing", "abstände", "grid", "layout", "responsive"]
+        tags: ["spacing", "grid", "layout", "responsive"]
       }
     ],
     components: [
@@ -84,30 +84,30 @@ export const KNOWLEDGE_BASE: KnowledgeBase = {
         title: "Buttons",
         category: "components",
         content: {
-          overview: "Buttons kommunizieren Aktionen klar.",
+          overview: "Buttons communicate actions clearly.",
           variants: [
-            { name: "Primary", bg: "#2563EB", usage: "Hauptaktion pro Screen" },
-            { name: "Secondary", bg: "transparent", usage: "Alternative Aktionen" },
-            { name: "Destructive", bg: "#EF4444", usage: "Lösch-Aktionen" }
+            { name: "Primary", bg: "#2563EB", usage: "Main action per view" },
+            { name: "Secondary", bg: "transparent", usage: "Alternative actions" },
+            { name: "Destructive", bg: "#EF4444", usage: "Delete actions" }
           ],
-          rules: ["Max 1 Primary Button pro Bereich", "Icon links vom Text"]
+          rules: ["Max 1 primary button per area", "Icon left of text"]
         },
-        tags: ["buttons", "cta", "aktionen", "primary"]
+        tags: ["buttons", "cta", "actions", "primary"]
       },
       {
         id: "kb-inputs",
-        title: "Input Felder",
+        title: "Input Fields",
         category: "components",
         content: {
-          overview: "Inputs für Benutzereingaben mit klarer Fehlerkommunikation.",
+          overview: "Inputs for user entries with clear error communication.",
           sizing: { height: "40px", padding: "12px", labelSpacing: "6px" },
           states: ["default", "hover", "focus", "error", "disabled"],
           rules: [
-            "Label NIE als Placeholder",
-            "Pflichtfelder mit Sternchen (*) markieren"
+            "Label NEVER as placeholder",
+            "Mark required fields with asterisk (*)"
           ]
         },
-        tags: ["inputs", "forms", "formular", "eingabe", "validation"]
+        tags: ["inputs", "forms", "form", "input", "validation"]
       }
     ],
     patterns: [
@@ -116,13 +116,13 @@ export const KNOWLEDGE_BASE: KnowledgeBase = {
         title: "Navigation Patterns",
         category: "patterns",
         content: {
-          overview: "Hierarchische Navigation für Orientierung.",
+          overview: "Hierarchical navigation for orientation.",
           types: {
-            topNav: { height: "64px", usage: "Globale Navigation" },
-            sideNav: { width: "256px", usage: "App-interne Navigation" },
-            tabBar: { height: "56px", usage: "Mobile Haupt-Navigation, max 5 Items" }
+            topNav: { height: "64px", usage: "Global navigation" },
+            sideNav: { width: "256px", usage: "App-internal navigation" },
+            tabBar: { height: "56px", usage: "Mobile main navigation, max 5 items" }
           },
-          rules: ["Max 7±2 Items pro Level", "Max 3 Level Verschachtelung"]
+          rules: ["Max 7±2 items per level", "Max 3 level nesting"]
         },
         tags: ["navigation", "menu", "sidebar", "mobile"]
       }
@@ -130,11 +130,11 @@ export const KNOWLEDGE_BASE: KnowledgeBase = {
   },
   
   glossary: [
-    { term: "Hero Section", definition: "Prominenter Bereich am Seitenanfang.", specs: "Min-Höhe: 400px" },
-    { term: "CTA", definition: "Call-to-Action – Button der zur Hauptaktion auffordert.", specs: "Primary Button" },
-    { term: "Card", definition: "Container für zusammengehörige Inhalte.", specs: "Padding: 16-24px" },
-    { term: "Modal", definition: "Überlagerndes Fenster das Fokus erzwingt.", specs: "Max-Width: 480px" },
-    { term: "Toast", definition: "Kurze, nicht-blockierende Benachrichtigung.", specs: "Duration: 4s" },
-    { term: "Empty State", definition: "Darstellung wenn keine Daten vorhanden.", specs: "Illustration + CTA" }
+    { term: "Hero Section", definition: "Prominent area at the top of the page.", specs: "Min height: 400px" },
+    { term: "CTA", definition: "Call-to-Action – Button that prompts the main action.", specs: "Primary Button" },
+    { term: "Card", definition: "Container for related content.", specs: "Padding: 16-24px" },
+    { term: "Modal", definition: "Overlay window that forces focus.", specs: "Max width: 480px" },
+    { term: "Toast", definition: "Short, non-blocking notification.", specs: "Duration: 4s" },
+    { term: "Empty State", definition: "Display when no data is available.", specs: "Illustration + CTA" }
   ]
 };

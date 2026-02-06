@@ -21,7 +21,7 @@ export default function Browse() {
         <div className="kb-section">
           <div className="kb-section-header">
             <SparklesIcon size={14} />
-            Projekt-Wissen
+            Project Knowledge
           </div>
           
           {mainKnowledgeBase.vision && (
@@ -30,12 +30,12 @@ export default function Browse() {
               onClick={() => actions.showDetail({
                 type: 'project',
                 id: 'vision',
-                title: 'Vision & Ziel',
+                title: 'Vision & Goal',
                 content: mainKnowledgeBase.vision,
               })}
             >
               <BookOpenIcon size={16} />
-              Vision & Ziel
+              Vision & Goal
             </div>
           )}
           
@@ -45,12 +45,12 @@ export default function Browse() {
               onClick={() => actions.showDetail({
                 type: 'project',
                 id: 'audience',
-                title: 'Zielgruppe',
+                title: 'Target Audience',
                 content: mainKnowledgeBase.audience,
               })}
             >
               <BookOpenIcon size={16} />
-              Zielgruppe
+              Target Audience
             </div>
           )}
           
@@ -60,12 +60,12 @@ export default function Browse() {
               onClick={() => actions.showDetail({
                 type: 'project',
                 id: 'features',
-                title: 'Kernfeatures',
+                title: 'Core Features',
                 content: mainKnowledgeBase.features,
               })}
             >
               <BookOpenIcon size={16} />
-              Kernfeatures
+              Core Features
             </div>
           )}
           
@@ -75,12 +75,12 @@ export default function Browse() {
               onClick={() => actions.showDetail({
                 type: 'project',
                 id: 'design',
-                title: 'Designsprache',
+                title: 'Design Language',
                 content: mainKnowledgeBase.design,
               })}
             >
               <BookOpenIcon size={16} />
-              Designsprache
+              Design Language
             </div>
           )}
           
@@ -90,12 +90,12 @@ export default function Browse() {
               onClick={() => actions.showDetail({
                 type: 'project',
                 id: 'terminology',
-                title: 'Terminologie',
+                title: 'Terminology',
                 content: mainKnowledgeBase.terminology,
               })}
             >
               <BookOpenIcon size={16} />
-              Terminologie
+              Terminology
             </div>
           )}
         </div>
@@ -122,7 +122,7 @@ export default function Browse() {
                   // Zoom zum Frame UND zeige Details
                   actions.zoomToSid(screen.sid);
                   actions.showDetail({
-                    type: 'screen',
+                    type: 'component',
                     id: screen.sid,
                     sid: screen.sid,
                     title: screen.name,
@@ -152,9 +152,9 @@ export default function Browse() {
       {screens.length === 0 && !mainKnowledgeBase && (
         <div className="empty-state">
           <BookOpenIcon size={48} />
-          <p>Noch keine Screens dokumentiert</p>
+          <p>No components documented yet</p>
           <p style={{ fontSize: 11, marginTop: 8 }}>
-            Wähle einen Frame aus und dokumentiere ihn im Editor
+            Select a frame and document it in the Editor
           </p>
         </div>
       )}

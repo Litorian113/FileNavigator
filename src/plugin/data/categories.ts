@@ -1,10 +1,11 @@
 import { ScreenCategory } from '../shared/types';
 
-// Verfügbare Kategorien für Screens
+// Available categories for components
 export const SCREEN_CATEGORIES: ScreenCategory[] = [
-  { id: 'pages', label: 'Seiten', icon: 'file' },
+  { id: 'pages', label: 'Pages', icon: 'file' },
   { id: 'flows', label: 'User Flows', icon: 'git-branch' },
-  { id: 'components', label: 'Component Specs', icon: 'box' },
+  { id: 'components', label: 'Components', icon: 'box' },
+  { id: 'docs', label: 'Documentation', icon: 'book' },
   { id: 'tests', label: 'UX Tests', icon: 'clipboard' },
-  { id: 'archive', label: 'Archiv', icon: 'archive' }
+  { id: 'archive', label: 'Archive', icon: 'archive' }
 ];

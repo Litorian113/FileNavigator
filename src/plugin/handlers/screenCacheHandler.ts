@@ -1,62 +1,47 @@
 import { ScreenData } from '../../shared/types';
 
-// Screen-Cache für schnelle Suche
+// Screen cache for fast search
 let screenCache: ScreenData[] = [];
 
+const CACHE_KEY = 'documentedScreens';
+
 /**
- * Baut den Screen-Cache neu auf (durchsucht alle Seiten)
+ * Loads the screen cache from clientStorage (fast!)
+ */
+export async function loadScreenCache(): Promise<ScreenData[]> {
+  try {
+    const stored = await figma.clientStorage.getAsync(CACHE_KEY);
+    screenCache = stored || [];
+    console.log(`Screen cache loaded: ${screenCache.length} documented components`);
+    return screenCache;
+  } catch (e) {
+    console.error('Error loading screen cache:', e);
+    screenCache = [];
+    return screenCache;
+  }
+}
+
+/**
+ * Saves the screen cache to clientStorage
+ */
+async function saveScreenCache(): Promise<void> {
+  try {
+    await figma.clientStorage.setAsync(CACHE_KEY, screenCache);
+  } catch (e) {
+    console.error('Error saving screen cache:', e);
+  }
+}
+
+/**
+ * Rebuilds the screen cache (searches all pages) - only call when needed
  */
 export async function rebuildScreenCache(): Promise<ScreenData[]> {
-  screenCache = [];
-  
-  // Lade alle Seiten für documentAccess: dynamic-page
-  await figma.loadAllPagesAsync();
-  
-  // Durchsuche ALLE Seiten im Dokument
-  for (const page of figma.root.children) {
-    findFramesShallow(page.children, 0);
-  }
-  
-  console.log(`Screen-Cache aktualisiert: ${screenCache.length} dokumentierte Screens`);
-  return screenCache;
+  // Just load from storage - don't scan
+  return loadScreenCache();
 }
 
 /**
- * Flache Suche mit Tiefenlimit um Einfrieren zu verhindern
- */
-function findFramesShallow(nodes: readonly SceneNode[], depth: number): void {
-  // Max 3 Ebenen tief (0, 1, 2)
-  if (depth > 2) return;
-  
-  for (const node of nodes) {
-    // Wenn es ein Frame mit SID ist, zur Liste hinzufügen
-    if (node.type === 'FRAME') {
-      const sid = node.getPluginData('sid');
-      if (sid) {
-        screenCache.push({
-          sid: sid,
-          name: node.name,
-          description: node.getPluginData('altText') || '',
-          features: node.getPluginData('features') || '',
-          category: node.getPluginData('category') || 'pages',
-          nodeId: node.id
-        });
-        // Nicht weiter in diesen Frame hinein suchen (Performance)
-        continue;
-      }
-    }
-    
-    // Nur in Sections und Groups weiter suchen, nicht in jeden Frame
-    if (node.type === 'SECTION' || node.type === 'GROUP') {
-      if ('children' in node && node.children) {
-        findFramesShallow(node.children, depth + 1);
-      }
-    }
-  }
-}
-
-/**
- * Aktualisiert einen einzelnen Screen im Cache (schnell)
+ * Updates a single screen in the cache (fast)
  */
 export function updateScreenInCache(sid: string, screenData: ScreenData): void {
   const existingIndex = screenCache.findIndex(s => s.sid === sid);
@@ -65,17 +50,31 @@ export function updateScreenInCache(sid: string, screenData: ScreenData): void {
   } else {
     screenCache.push(screenData);
   }
+  // Persist to storage
+  saveScreenCache();
 }
 
 /**
- * Gibt den aktuellen Screen-Cache zurück
+ * Removes a screen from the cache by SID
+ */
+export function removeScreenFromCache(sid: string): void {
+  const index = screenCache.findIndex(s => s.sid === sid);
+  if (index >= 0) {
+    screenCache.splice(index, 1);
+  }
+  // Persist to storage
+  saveScreenCache();
+}
+
+/**
+ * Returns the current screen cache
  */
 export function getScreenCache(): ScreenData[] {
   return screenCache;
 }
 
 /**
- * Sucht einen Screen im Cache anhand der SID
+ * Finds a screen in the cache by SID
  */
 export function findScreenBySid(sid: string): ScreenData | undefined {
   return screenCache.find(s => s.sid === sid);

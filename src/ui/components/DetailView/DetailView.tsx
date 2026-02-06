@@ -1,9 +1,12 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
-import { ArrowLeftIcon } from '../shared/Icons';
+import { ArrowLeftIcon, TrashIcon } from '../shared/Icons';
 
 // Formatiert inline Markdown (bold, italic)
-function formatInlineText(text: string): React.ReactNode {
+function formatInlineText(text: string | any): React.ReactNode {
+  if (!text) return '';
+  const textStr = typeof text === 'string' ? text : String(text);
+  
   // Regex für **bold** und *italic*
   const parts: React.ReactNode[] = [];
   let lastIndex = 0;
@@ -12,10 +15,10 @@ function formatInlineText(text: string): React.ReactNode {
   const regex = /\*\*([^*]+)\*\*|\*([^*]+)\*/g;
   let match;
   
-  while ((match = regex.exec(text)) !== null) {
+  while ((match = regex.exec(textStr)) !== null) {
     // Text vor dem Match
     if (match.index > lastIndex) {
-      parts.push(text.substring(lastIndex, match.index));
+      parts.push(textStr.substring(lastIndex, match.index));
     }
     
     if (match[1]) {
@@ -30,18 +33,21 @@ function formatInlineText(text: string): React.ReactNode {
   }
   
   // Rest des Textes
-  if (lastIndex < text.length) {
-    parts.push(text.substring(lastIndex));
+  if (lastIndex < textStr.length) {
+    parts.push(textStr.substring(lastIndex));
   }
   
-  return parts.length > 0 ? parts : text;
+  return parts.length > 0 ? parts : textStr;
 }
 
 // Formatiert Inhalt mit Aufzählungszeichen und Markdown
-function formatContent(content: string): React.ReactNode {
+function formatContent(content: string | any): React.ReactNode {
   if (!content) return null;
   
-  const lines = content.split('\n').map(line => line.trim()).filter(line => line);
+  // Ensure content is a string
+  const textContent = typeof content === 'string' ? content : String(content);
+  
+  const lines = textContent.split('\n').map(line => line.trim()).filter(line => line);
   const elements: React.ReactNode[] = [];
   let currentList: string[] = [];
   
@@ -135,6 +141,57 @@ export default function DetailView() {
       </div>
 
       <div className="detail-content">
+        {/* Component specific view */}
+        {detailItem.type === 'component' && (
+          <>
+            <div className="detail-section">
+              <div className="detail-section-title">Description</div>
+              <div style={{ marginBottom: 8, lineHeight: 1.5 }}>
+                {formatContent(detailItem.content || detailItem.snippet || 'No description available.')}
+              </div>
+            </div>
+            
+            {detailItem.tags && detailItem.tags.length > 0 && (
+              <div className="detail-section">
+                <div className="detail-section-title">Features</div>
+                <div className="result-tags" style={{ marginTop: 8 }}>
+                  {detailItem.tags.map((tag: string, i: number) => (
+                    <span key={i} className="tag">{tag}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* Delete Button for Components */}
+            {detailItem.sid && (
+              <div style={{ marginTop: 24, paddingTop: 16, borderTop: '1px solid var(--border-color)' }}>
+                <button 
+                  className="btn btn-danger"
+                  style={{ 
+                    width: '100%',
+                    background: '#FEE2E2',
+                    color: '#DC2626',
+                    border: '1px solid #FECACA',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 8
+                  }}
+                  onClick={() => {
+                    if (confirm(`Remove documentation for "${detailItem.title}"?`)) {
+                      actions.deleteScreen(detailItem.sid);
+                      actions.goBack();
+                    }
+                  }}
+                >
+                  <TrashIcon size={14} />
+                  Remove Documentation
+                </button>
+              </div>
+            )}
+          </>
+        )}
+        
         {/* Projektname für KB-Einträge */}
         {detailItem.type === 'project' && projectName && (
           <div className="detail-section">
@@ -142,17 +199,17 @@ export default function DetailView() {
           </div>
         )}
         
-        {/* Hauptinhalt - formatiert */}
-        {mainContent && (
+        {/* Hauptinhalt - formatiert (nicht für components) */}
+        {detailItem.type !== 'component' && mainContent && (
           <div className="detail-section">
             {formatContent(mainContent)}
           </div>
         )}
 
-        {/* Spezifikationen (für Knowledge Items) */}
+        {/* Specifications (for Knowledge Items) */}
         {detailItem.specs && (
           <div className="detail-section">
-            <div className="detail-section-title">Spezifikationen</div>
+            <div className="detail-section-title">Specifications</div>
             <div className="spec-grid">
               {Object.entries(detailItem.specs).map(([key, value]) => (
                 <div key={key} className="spec-item">
@@ -164,10 +221,10 @@ export default function DetailView() {
           </div>
         )}
 
-        {/* Regeln */}
+        {/* Rules */}
         {detailItem.rules && detailItem.rules.length > 0 && (
           <div className="detail-section">
-            <div className="detail-section-title">Regeln</div>
+            <div className="detail-section-title">Rules</div>
             <ul className="rule-list">
               {detailItem.rules.map((rule: string, index: number) => (
                 <li key={index}>{rule}</li>
@@ -176,10 +233,10 @@ export default function DetailView() {
           </div>
         )}
 
-        {/* Beispiele */}
+        {/* Examples */}
         {detailItem.examples && detailItem.examples.length > 0 && (
           <div className="detail-section">
-            <div className="detail-section-title">Beispiele</div>
+            <div className="detail-section-title">Examples</div>
             <ul className="rule-list">
               {detailItem.examples.map((example: string, index: number) => (
                 <li key={index}>{example}</li>
@@ -188,7 +245,7 @@ export default function DetailView() {
           </div>
         )}
 
-        {/* Bearbeiten-Button für Projekt-Einträge */}
+        {/* Edit button for project entries */}
         {detailItem.type === 'project' && (
           <div style={{ marginTop: 16, paddingTop: 12, borderTop: '1px solid var(--border-color)' }}>
             <button 
@@ -196,7 +253,7 @@ export default function DetailView() {
               style={{ width: '100%' }}
               onClick={() => actions.navigateTo('onboarding')}
             >
-              ✏️ Bearbeiten
+              ✏️ Edit
             </button>
           </div>
         )}

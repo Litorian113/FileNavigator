@@ -3,7 +3,7 @@
 import { PluginMessage } from '../shared/types';
 import { SCREEN_CATEGORIES } from './data/categories';
 import { KNOWLEDGE_BASE } from './data/knowledgeBase';
-import { generateSID, postToUI } from './utils/helpers';
+import { generateSID, postToUI, isDocumentableNode } from './utils/helpers';
 import { 
   loadMainKnowledgeBase, 
   saveMainKnowledgeBase, 
@@ -13,7 +13,9 @@ import {
   rebuildScreenCache, 
   updateScreenInCache, 
   getScreenCache,
-  findScreenBySid 
+  findScreenBySid,
+  removeScreenFromCache,
+  loadScreenCache
 } from './handlers/screenCacheHandler';
 import { searchKnowledgeBase, getKnowledgeById } from './handlers/searchHandler';
 
@@ -38,19 +40,24 @@ function updateUI(): void {
 
   const node = selection[0];
 
-  if (node.type !== 'FRAME') {
+  if (!isDocumentableNode(node)) {
     postToUI({ type: 'wrong-type' }, apiKey);
     return;
   }
 
+  // Auto-Kategorie basierend auf Node-Typ bestimmen
+  const isComponentType = node.type === 'COMPONENT' || node.type === 'COMPONENT_SET' || node.type === 'INSTANCE';
+  const savedCategory = node.getPluginData('category');
+  const defaultCategory = isComponentType ? 'components' : 'pages';
+
   postToUI({
     type: 'update-data',
     altText: node.getPluginData('altText') || '',
-    sid: node.getPluginData('sid') || 'Noch keine SID',
+    sid: node.getPluginData('sid') || 'No SID yet',
     nodeName: node.name,
     features: node.getPluginData('features') || '',
     linkedKnowledge: node.getPluginData('linkedKnowledge') || '',
-    category: node.getPluginData('category') || 'pages',
+    category: savedCategory || defaultCategory,
     categories: SCREEN_CATEGORIES
   }, apiKey);
 }
@@ -84,7 +91,7 @@ figma.ui.onmessage = (msg: PluginMessage) => {
   // Screen Data
   if (msg.type === 'save-alt-text') {
     const selection = figma.currentPage.selection;
-    if (selection.length === 1 && selection[0].type === 'FRAME') {
+    if (selection.length === 1 && isDocumentableNode(selection[0])) {
       const node = selection[0];
       
       let sid = node.getPluginData('sid');
@@ -95,15 +102,15 @@ figma.ui.onmessage = (msg: PluginMessage) => {
       
       node.setPluginData('altText', msg.altText);
       updateUI();
-      figma.notify("Alt-Text und SID gespeichert!");
+      figma.notify("Alt text and SID saved!");
     } else {
-      figma.notify("Bitte genau einen Frame auswählen.");
+      figma.notify("Please select a frame or component.");
     }
   }
   
   if (msg.type === 'save-screen-data') {
     const selection = figma.currentPage.selection;
-    if (selection.length === 1 && selection[0].type === 'FRAME') {
+    if (selection.length === 1 && isDocumentableNode(selection[0])) {
       const node = selection[0];
       
       let sid = node.getPluginData('sid');
@@ -134,7 +141,54 @@ figma.ui.onmessage = (msg: PluginMessage) => {
       });
       
       updateUI();
-      figma.notify("Screen dokumentiert! ✓");
+      figma.notify("Component documented! ✓");
+    }
+  }
+  
+  // Delete screen documentation
+  if (msg.type === 'delete-screen-data') {
+    const sid = msg.sid;
+    if (!sid) {
+      figma.notify("No SID provided.");
+      return;
+    }
+    
+    // Find the node with this SID and clear its plugin data
+    const cachedScreen = findScreenBySid(sid);
+    if (cachedScreen) {
+      figma.getNodeByIdAsync(cachedScreen.nodeId).then(node => {
+        if (node) {
+          // Clear all plugin data from the node
+          node.setPluginData('sid', '');
+          node.setPluginData('altText', '');
+          node.setPluginData('features', '');
+          node.setPluginData('linkedKnowledge', '');
+          node.setPluginData('category', '');
+        }
+        
+        // Remove from cache
+        removeScreenFromCache(sid);
+        
+        // Update UI
+        figma.ui.postMessage({
+          type: 'screens-updated',
+          screens: getScreenCache(),
+          categories: SCREEN_CATEGORIES,
+          apiKey
+        });
+        
+        figma.notify("Documentation removed ✓");
+      });
+    } else {
+      // Just remove from cache if node not found
+      removeScreenFromCache(sid);
+      figma.ui.postMessage({
+        type: 'screens-updated',
+        screens: getScreenCache(),
+        categories: SCREEN_CATEGORIES,
+        apiKey
+      });
+      figma.notify("Documentation removed ✓");
     }
   }
   
@@ -142,12 +196,12 @@ figma.ui.onmessage = (msg: PluginMessage) => {
   if (msg.type === 'search-frames') {
     const query = msg.query.toLowerCase();
     if (!query) {
-      figma.notify("Bitte Suchbegriff eingeben.");
+      figma.notify("Please enter a search term.");
       return;
     }
 
     const matches = figma.currentPage.findAll(node => {
-      if (node.type !== 'FRAME') return false;
+      if (!isDocumentableNode(node)) return false;
       const altText = node.getPluginData('altText');
       return !!(altText && altText.toLowerCase().includes(query));
     });
@@ -155,9 +209,9 @@ figma.ui.onmessage = (msg: PluginMessage) => {
     if (matches.length > 0) {
       figma.currentPage.selection = matches;
       figma.viewport.scrollAndZoomIntoView(matches);
-      figma.notify(`${matches.length} Frame(s) gefunden!`);
+      figma.notify(`${matches.length} frame(s) found!`);
     } else {
-      figma.notify("Keine Frames mit diesem Text gefunden.");
+      figma.notify("No frames found with this text.");
     }
   }
   
@@ -179,10 +233,10 @@ figma.ui.onmessage = (msg: PluginMessage) => {
         if (node) {
           figma.currentPage.selection = [node as SceneNode];
           figma.viewport.scrollAndZoomIntoView([node as SceneNode]);
-          figma.notify(`Gefunden: ${node.name}`);
+          figma.notify(`Found: ${node.name}`);
         } else {
           rebuildScreenCache().catch(console.error);
-          figma.notify("Frame wurde gelöscht oder verschoben.");
+          figma.notify("Frame was deleted or moved.");
         }
       });
       return;
@@ -192,10 +246,10 @@ figma.ui.onmessage = (msg: PluginMessage) => {
     if (node) {
       figma.currentPage.selection = [node];
       figma.viewport.scrollAndZoomIntoView([node]);
-      figma.notify(`Gefunden: ${node.name}`);
+      figma.notify(`Found: ${node.name}`);
       rebuildScreenCache().catch(console.error);
     } else {
-      figma.notify("Frame konnte nicht gefunden werden.");
+      figma.notify("Frame could not be found.");
     }
   }
   
@@ -232,22 +286,22 @@ figma.ui.onmessage = (msg: PluginMessage) => {
   // Image Export für AI
   if (msg.type === 'get-image-for-ai') {
     const selection = figma.currentPage.selection;
-    if (selection.length === 1 && selection[0].type === 'FRAME') {
-      const node = selection[0];
+    if (selection.length === 1 && isDocumentableNode(selection[0])) {
+      const node = selection[0] as FrameNode;
       node.exportAsync({ format: 'PNG', constraint: { type: 'SCALE', value: 0.5 } })
         .then(bytes => {
           figma.ui.postMessage({ type: 'image-data', bytes: bytes, apiKey });
         })
         .catch(err => {
           console.error(err);
-          figma.notify("Fehler beim Exportieren des Bildes");
+          figma.notify("Error exporting image");
           figma.ui.postMessage({ type: 'image-error', apiKey });
         });
     }
   }
   
   if (msg.type === 'collect-all-frames') {
-    const frames = figma.currentPage.findAll(node => node.type === 'FRAME');
+    const frames = figma.currentPage.findAll(node => isDocumentableNode(node));
     const searchableData = frames
       .filter(node => node.getPluginData('sid') && node.getPluginData('altText'))
       .map(node => ({
@@ -276,9 +330,16 @@ figma.ui.onmessage = (msg: PluginMessage) => {
 // Initiales UI-Update
 updateUI();
 
-// Cache aufbauen
-rebuildScreenCache().then(() => {
-  console.log('Initial cache ready');
+// Cache aus Storage laden (schnell!) und dann Screens an UI senden
+loadScreenCache().then(() => {
+  console.log('Screen cache loaded from storage');
+  // Sende aktualisierte Screens an UI
+  figma.ui.postMessage({
+    type: 'screens-updated',
+    screens: getScreenCache(),
+    categories: SCREEN_CATEGORIES,
+    apiKey
+  });
 });
 
 // Main Knowledge Base laden
