@@ -60,7 +60,7 @@ const steps: StepConfig[] = [
     field: 'features',
     placeholder: '• Echtzeit-Chat mit Threading\n• Videocalls\n• Dateifreigabe',
     aiType: 'features',
-    aiLabel: 'strukturieren',
+    aiLabel: 'verbessern',
   },
   {
     icon: PaletteIcon,
@@ -78,7 +78,7 @@ const steps: StepConfig[] = [
     field: 'terminology',
     placeholder: '• Workspace = Ein Team-Bereich\n• Channel = Themenbasierter Chat-Raum',
     aiType: 'terms',
-    aiLabel: 'strukturieren',
+    aiLabel: 'verbessern',
   },
   {
     icon: CheckCircleIcon,

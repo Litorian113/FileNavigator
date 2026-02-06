@@ -11,7 +11,8 @@
   --spacing-unit: 8px;
   --success-color: #10B981;
   --warning-color: #F59E0B;
-  --ai-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --ai-action-color: #667eea;
+  --ai-action-hover: #5a6fd6;
 }
 
 * {
@@ -129,7 +130,7 @@ textarea {
   align-items: center;
   gap: 6px;
   padding: 8px 12px;
-  background: var(--ai-gradient);
+  background: var(--ai-action-color);
   color: white;
   border: none;
   border-radius: 6px;
@@ -141,7 +142,7 @@ textarea {
 }
 
 .ai-improve-btn:hover {
-  opacity: 0.9;
+  background: var(--ai-action-hover);
   transform: translateY(-1px);
 }
 
@@ -182,17 +183,16 @@ textarea {
   align-items: center;
   gap: 4px;
   padding: 6px 10px;
-  background: var(--ai-gradient);
+  background: var(--ai-action-color);
   color: white;
   border: none;
   border-radius: 4px;
   font-size: 11px;
   cursor: pointer;
-  opacity: 0.9;
   transition: all 0.2s;
 }
 
-.inline-ai-btn:hover { opacity: 1; }
+.inline-ai-btn:hover { background: var(--ai-action-hover); }
 .inline-ai-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .inline-ai-btn svg { width: 12px; height: 12px; }
 

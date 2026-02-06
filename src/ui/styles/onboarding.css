@@ -19,7 +19,7 @@
   width: 64px;
   height: 64px;
   margin: 0 auto 16px;
-  background: var(--ai-gradient);
+  background: var(--ai-action-color);
   border-radius: 16px;
   display: flex;
   align-items: center;
