@@ -1,53 +1,52 @@
-# 🧭 FileNavigator – Design Documentation, Reimagined
+# 🧭 FileNavigator – An Experiment in Design Documentation
 
-> **"Documentation shouldn't be a separate task – it should be part of the design."**
-
----
-
-## 🎯 The Problem: Why Design Documentation Still Fails
-
-Every design team knows this pain:
-
-### The Handoff Gap
-Designers create beautiful, thoughtful interfaces in Figma. Developers receive a link and a Slack message: *"Here's the new design!"* What follows is a series of questions:
-- *"What happens when this button is clicked?"*
-- *"Is this the hover state or the default?"*
-- *"Where does this user flow start?"*
-- *"What's the spacing between these elements?"*
-
-### Documentation Lives Elsewhere
-Design decisions, user research, and component specifications end up scattered across:
-- Confluence pages nobody reads
-- Notion databases that grow stale
-- Google Docs lost in shared drives
-- Slack threads buried in history
-
-### The Knowledge Problem
-When a new team member joins, they face weeks of archaeology – digging through old files, asking "tribal knowledge" questions, and hoping someone remembers *why* that button is orange.
+> **"What if documentation wasn't something you maintain on the side, but something that naturally evolves with the design process?"**
 
 ---
 
-## 💡 The Solution: Documentation That Lives Where Design Lives
+## 💭 The Exploration
 
-**FileNavigator** brings documentation directly into Figma – right where the design happens.
+This is an **MVP experiment** exploring a simple idea: documentation often feels harder than it should be because it lives *separate* from the design process.
 
-Think of it like the `alt` attribute in HTML: just as every `<img>` can carry descriptive text for accessibility and context, **every Frame in Figma can now carry rich documentation**.
+Instead of writing and rewriting documentation across Figma, Notion, Confluence, and various docs, I'm experimenting with a workflow where **design becomes the entry point to project knowledge**.
+
+### The Inspiration: Alt Attributes
+
+The concept came from the web: images don't explain themselves, so we attach `alt` attributes directly to them.
 
 ```html
-<!-- In HTML, we document images like this: -->
-<img src="hero.png" alt="A developer and designer collaborating on a project" />
+<img src="component.png" alt="Navigation bar with user profile and notifications" />
 ```
 
-```
-FileNavigator does the same for Figma Frames:
+I'm applying the same principle to design: **every screen, component, and user flow carries its own context** – what it does, why it exists, and how it fits into the bigger picture.
 
+### The Vision
+
+Each new component, page, variant, user flow, or user test continuously feeds the project with information. That knowledge is interconnected and evolves over time.
+
+For **developers**, this means asking *"Where is the user flow?"* or *"What happens in this state?"* and getting direct answers, not a list of links to read through.
+
+For **designers**, it means less friction. Significant changes can be documented quickly, right when they happen. AI helps improve and refine the text using existing project knowledge – not rewriting it, but putting it into context and structuring it properly.
+
+### Current State (MVP)
+
+Right now, everything intentionally lives **locally and close to the design** in Figma. The plan is to eventually connect with tools like Notion or Confluence, but the focus is on making documentation accessible, contextual, and actionable within the design environment first.
+
+---
+
+## 🎨 How It Works (Current MVP)
+
+Figma isn't meant to replace other tools – it's where the knowledge becomes **accessible, contextual, and actionable**.
+
+```
 Frame: "Onboarding-Step-1" 
-  → Description: "First step of user registration. User enters email..."
+  → Description: "First step of user registration. Shows email input..."
   → Features: "Email validation, SSO options, Progress indicator"
   → Category: "User Flow"
+  → Connected to: Project Knowledge Base
 ```
 
-**The result?** Developers can search "Where is the email validation?" and instantly jump to the right frame – with full context about what it does and why.
+This documentation is **searchable**, **browsable**, and **editable** directly from the design environment without breaking focus or switching mental context.
 
 ---
 
@@ -102,8 +101,8 @@ Struggling to write documentation? The built-in AI helps:
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/filenavigator.git
-cd filenavigator
+git clone https://github.com/Litorian113/FileNavigator.git
+cd FileNavigator
 
 # Install dependencies
 npm install
@@ -390,6 +389,6 @@ Built with:
 
 ---
 
-[🐛 Report Bug](https://github.com/your-org/filenavigator/issues) · [✨ Request Feature](https://github.com/your-org/filenavigator/issues) · [📖 Wiki](https://github.com/your-org/filenavigator/wiki)
+[🐛 Report Bug](https://github.com/Litorian113/FileNavigator/issues) · [✨ Request Feature](https://github.com/Litorian113/FileNavigator/issues)
 
 </div>

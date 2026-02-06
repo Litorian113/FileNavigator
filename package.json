@@ -1,7 +1,23 @@
 {
-  "name": "FileNavigator",
+  "name": "filenavigator",
   "version": "1.0.0",
-  "description": "Figma Plugin - Design Documentation & Knowledge Base",
+  "description": "AI-powered Figma plugin for design documentation that naturally evolves with your design process",
+  "author": "Litorian113",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Litorian113/FileNavigator.git"
+  },
+  "keywords": [
+    "figma",
+    "figma-plugin",
+    "design-documentation",
+    "design-systems",
+    "ai",
+    "openai",
+    "ux-design",
+    "developer-experience"
+  ],
   "main": "dist/code.js",
   "scripts": {
     "dev": "concurrently \"npm run dev:plugin\" \"npm run dev:ui\"",

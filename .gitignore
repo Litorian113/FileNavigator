@@ -7,3 +7,5 @@ node_modules
 out/
 dist/
 code.js
+code.ts.backup
+ui.html.backup
