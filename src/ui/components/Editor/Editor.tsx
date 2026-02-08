@@ -12,6 +12,8 @@ export default function Editor() {
   const [category, setCategory] = useState('pages');
   const [isImproving, setIsImproving] = useState(false);
 
+
+  //Test
   // Sync form with selected node
   useEffect(() => {
     if (selectedNode) {
